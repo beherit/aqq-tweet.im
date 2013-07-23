@@ -1,0 +1,1 @@
+Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.
