@@ -1,3 +1,24 @@
+//---------------------------------------------------------------------------
+// Copyright (C) 2013 Krzysztof Grochocki
+//
+// This file is part of tweet.IM
+//
+// tweet.IM is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3, or (at your option)
+// any later version.
+//
+// tweet.IM is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with GNU Radio; see the file COPYING. If not, write to
+// the Free Software Foundation, Inc., 51 Franklin Street,
+// Boston, MA 02110-1301, USA.
+//---------------------------------------------------------------------------
+
 #include <vcl.h>
 #include <windows.h>
 #pragma hdrstop
@@ -20,29 +41,6 @@ TTweetForm* hTweetForm;
 //Struktury-glowne-----------------------------------------------------------
 TPluginLink PluginLink;
 TPluginInfo PluginInfo;
-PPluginContact ActiveTabContact;
-PPluginContact AddLineContact;
-PPluginContact PrimaryTabContact;
-PPluginChatState ChatState;
-PPluginMessage Message;
-//Szybki-dostep-do-ustawien-wtyczki------------------------------------------
-TPluginAction FastSettingsItem;
-//Szybkie-wstawianie-nicku/tagu----------------------------------------------
-TPluginAction InsertTagItem;
-TPluginAction InsertNickItem;
-TPluginAction SendPrivMsgItem;
-TPluginAction LikeLastTweetItem;
-TPluginAction ShowTimelineItem;
-TPluginAction ShowUserProfileItem;
-TPluginAction SeparatorItem;
-//Przycisk-z-komendami-bota--------------------------------------------------
-TPluginAction CommandPopUp;
-TPluginAction CommandButton;
-TPluginAction UpdateCommandItem;
-TPluginAction IngCommandItem;
-TPluginAction ErsCommandItem;
-TPluginAction UndoTweetCommandItem;
-TPluginAction SavedSearchesCommandItem;
 //---------------------------------------------------------------------------
 //Informacje o aktywnej zakladce
 UnicodeString ActiveTabJID;
@@ -63,6 +61,8 @@ UnicodeString ItemCopyData;
 HWND hFrmSend;
 //Uchwyt do pola RichEdit
 HWND hRichEdit;
+//Ostatnio wyswietlona wiadomosci od bota
+UnicodeString LastBody;
 //SETTINGS-------------------------------------------------------------------
 int AvatarSize;
 UnicodeString StaticAvatarStyle;
@@ -604,6 +604,8 @@ UnicodeString GetAvatarsListItem()
 //Tworzenie elementu szybkiego dostepu do ustawien wtyczki
 void BuildtweetIMFastSettings()
 {
+  TPluginAction FastSettingsItem;
+  ZeroMemory(&FastSettingsItem,sizeof(TPluginAction));
   FastSettingsItem.cbSize = sizeof(TPluginAction);
   FastSettingsItem.pszName = L"tweetIMFastSettingsItemButton";
   FastSettingsItem.pszCaption = L"tweet.IM";
@@ -911,28 +913,41 @@ int __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam)
 void DestroyCommandItems()
 {
   //Usuwanie "Pobierz nieprzeczytane tweety"
+  TPluginAction UpdateCommandItem;
+  ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
   UpdateCommandItem.cbSize = sizeof(TPluginAction);
   UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UpdateCommandItem));
   //Usuwanie "Obserwowani"
+  TPluginAction IngCommandItem;
+  ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
   IngCommandItem.cbSize = sizeof(TPluginAction);
   IngCommandItem.pszName = L"tweetIMIngCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&IngCommandItem));
   //Usuwanie "Obserwuj¹cy"
+  TPluginAction ErsCommandItem;
+  ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
   ErsCommandItem.cbSize = sizeof(TPluginAction);
   ErsCommandItem.pszName = L"tweetIMErsCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
   //Usuwanie "Usun poprzednie tweetniecie"
+  TPluginAction UndoTweetCommandItem;
+  ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
   UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
   UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
   //Usuwanie "Zapisane wyszukiwania"
+  TPluginAction SavedSearchesCommandItem;
+  ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
   SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
   SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
   //Usuwanie buttona w oknie rozmowy
+  TPluginAction CommandButton;
+  ZeroMemory(&CommandButton,sizeof(TPluginAction));
   CommandButton.cbSize = sizeof(TPluginAction);
   CommandButton.pszName = L"tweetIMCommandButton";
+  CommandButton.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_DESTROYBUTTON ,0,(LPARAM)(&CommandButton));
 }
 //---------------------------------------------------------------------------
@@ -946,6 +961,8 @@ void BuildCommandItems()
   if(hFrmSend)
   {
 	//Tworzenie buttona w oknie rozmowy
+	TPluginAction CommandButton;
+	ZeroMemory(&CommandButton,sizeof(TPluginAction));
 	CommandButton.cbSize = sizeof(TPluginAction);
 	CommandButton.pszName = L"tweetIMCommandButton";
 	CommandButton.Hint = L"Komendy bota tweet.IM";
@@ -955,6 +972,8 @@ void BuildCommandItems()
 	CommandButton.Handle = (int)hFrmSend;
 	PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_CREATEBUTTON,0,(LPARAM)(&CommandButton));
 	//Tworzenie "Zapisane wyszukiwania"
+	TPluginAction SavedSearchesCommandItem;
+	ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
 	SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
 	SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
 	SavedSearchesCommandItem.pszCaption = L"Zapisane wyszukiwania";
@@ -964,6 +983,8 @@ void BuildCommandItems()
 	SavedSearchesCommandItem.pszPopupName = L"tweetIMCommandPopUp";
 	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SavedSearchesCommandItem));
 	//Tworzenie "Usun poprzednie tweetniecie"
+	TPluginAction UndoTweetCommandItem;
+	ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
 	UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
 	UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
 	UndoTweetCommandItem.pszCaption = L"Usuñ poprzednie tweetniêcie";
@@ -973,6 +994,8 @@ void BuildCommandItems()
 	UndoTweetCommandItem.pszPopupName = L"tweetIMCommandPopUp";
 	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&UndoTweetCommandItem));
 	//Tworzenie "Obserwuj¹cy"
+	TPluginAction ErsCommandItem;
+	ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
 	ErsCommandItem.cbSize = sizeof(TPluginAction);
 	ErsCommandItem.pszName = L"tweetIMErsCommandItem";
 	ErsCommandItem.pszCaption = L"Obserwuj¹cy";
@@ -982,6 +1005,8 @@ void BuildCommandItems()
 	ErsCommandItem.pszPopupName = L"tweetIMCommandPopUp";
 	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ErsCommandItem));
 	//Tworzenie "Obserwowani"
+	TPluginAction IngCommandItem;
+	ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
 	IngCommandItem.cbSize = sizeof(TPluginAction);
 	IngCommandItem.pszName = L"tweetIMIngCommandItem";
 	IngCommandItem.pszCaption = L"Obserwowani";
@@ -991,6 +1016,8 @@ void BuildCommandItems()
 	IngCommandItem.pszPopupName = L"tweetIMCommandPopUp";
 	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&IngCommandItem));
 	//Tworzenie "Pobierz nieprzeczytane tweety"
+	TPluginAction UpdateCommandItem;
+	ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
 	UpdateCommandItem.cbSize = sizeof(TPluginAction);
 	UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
 	UpdateCommandItem.pszCaption = L"Pobierz nieprzeczytane tweety";
@@ -1011,10 +1038,10 @@ int __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
   //Szukanie pola wiadomosci
   if(!hRichEdit) EnumChildWindows(hFrmSend,(WNDENUMPROC)FindRichEdit,0);
   //Pobieranie danych kontatku
-  ActiveTabContact = (PPluginContact)lParam;
-  ActiveTabJID = (wchar_t*)ActiveTabContact->JID;
-  ActiveTabRes = (wchar_t*)ActiveTabContact->Resource;
-  ActiveTabUsrIdx = ActiveTabContact->UserIdx;
+  TPluginContact ActiveTabContact = *(PPluginContact)lParam;
+  ActiveTabJID = (wchar_t*)ActiveTabContact.JID;
+  ActiveTabRes = (wchar_t*)ActiveTabContact.Resource;
+  ActiveTabUsrIdx = ActiveTabContact.UserIdx;
   //Kontakt jest botem tweet.IM
   if(ActiveTabJID.Pos("@twitter.tweet.im"))
   {
@@ -1039,330 +1066,337 @@ int __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
 int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 {
   //Pobieranie danych kontatku
-  AddLineContact = (PPluginContact)wParam;
+  TPluginContact AddLineContact = *(PPluginContact)wParam;
   //Pobieranie identyfikatora kontatku
-  UnicodeString ContactJID = (wchar_t*)AddLineContact->JID;
+  UnicodeString ContactJID = (wchar_t*)AddLineContact.JID;
   //Kontakt jest botem tweet.IM
   if(ContactJID.Pos("@twitter.tweet.im"))
   {
 	//Nadawca wiadomosci
 	UnicodeString TweetSender = "";
 	//Pobieranie informacji  wiadomosci
-	Message = (PPluginMessage)lParam;
-	UnicodeString MessageDate = (double)Message->Date;
-	UnicodeString MessageJID = (wchar_t*)Message->JID;
+	TPluginMessage AddLineMessage = *(PPluginMessage)lParam;
+	UnicodeString MessageDate = (double)AddLineMessage.Date;
+	UnicodeString MessageJID = (wchar_t*)AddLineMessage.JID;
 	if(MessageJID.Pos("/")) MessageJID.Delete(MessageJID.Pos("/"),MessageJID.Length());
-	UnicodeString Body = (wchar_t*)Message->Body;
+	UnicodeString Body = (wchar_t*)AddLineMessage.Body;
 	Body = Body.Trim();
-	//Non-breaking space
-	if(Body.Pos("&#12288;")) Body = StringReplace(Body, "&#12288;", " ", TReplaceFlags() << rfReplaceAll);
-
-	//Formatowanie tagow
-	while(Body.Pos("#"))
+	//Zabezpieczenie przed bledem bota - dublowanie wiadomosci
+	if(Body!=LastBody)
 	{
-	  //Zmienne tymczasowe
-	  UnicodeString TempStr = Body;
-	  UnicodeString TempStr2 = Body;
-	  //Sprawdzanie poprzedniego znaku/frazy
-	  TempStr.Delete(TempStr.Pos("#"),TempStr.Length());
-	  while(TempStr.Pos(" ")) TempStr.Delete(1,TempStr.Pos(" "));
-	  //Sprawdzanie kolejnego znaku
-	  TempStr2.Delete(1,TempStr2.Pos("#"));
-	  TempStr2.Delete(2,TempStr2.Length());
-	  //Jezeli fraza jest tagiem
-	  if((AllowedTagsCharacters(TempStr2))
-	   &&(TempStr.LowerCase().Pos("href=\"link:")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"http://")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"https://")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"www")==0))
+	  //Zapamietanie wiadomosci
+	  LastBody = Body;
+	  //Non-breaking space
+  	  if(Body.Pos("&#12288;")) Body = StringReplace(Body, "&#12288;", " ", TReplaceFlags() << rfReplaceAll);
+	  //Formatowanie tagow
+	  while(Body.Pos("#"))
 	  {
-		//Usuwanie hasha z tagu
-		UnicodeString TagWithOutHash = Body;
-		TagWithOutHash.Delete(1,TagWithOutHash.Pos("#"));
-		TagWithOutHash.Delete(TagsCutPosition(TagWithOutHash),TagWithOutHash.Length());
-		//Usuwanie polskich znakow
-		UnicodeString TagWithOutHashW = TagWithOutHash;
-		TagWithOutHashW = TagWithOutHashW.LowerCase();
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "ê", "e", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "ó", "o", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "¹", "a", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "œ", "s", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "³", "l", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "¿", "z", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "Ÿ", "z", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "æ", "c", TReplaceFlags() << rfReplaceAll);
-		TagWithOutHashW = StringReplace(TagWithOutHashW, "ñ", "n", TReplaceFlags() << rfReplaceAll);
-		//Tworzenie tagu
-		UnicodeString TagWithHash = "#" + TagWithOutHash;
-		//Formatowanie tagu
-		if((TagWithHash.Pos("-")==0)&&(TagWithHash.Pos("_")==0))
-		{
-		  TagWithOutHashW = "[CC_TAGS_LINK]" + TagWithOutHashW + "[CC_TAGS_LINK2][CC_TAGS]" + TagWithOutHash + "[CC_TAGS_LINK3]";
-		  Body = StringReplace(Body, TagWithHash, TagWithOutHashW, TReplaceFlags());
-		}
-		else
-		{
-		  TagWithOutHashW = StringReplace(TagWithOutHashW, "-", "", TReplaceFlags() << rfReplaceAll);
-		  TagWithOutHashW = StringReplace(TagWithOutHashW, "_", "", TReplaceFlags() << rfReplaceAll);
-		  TagWithOutHashW = "[CC_TAGS_LINK]" + TagWithOutHashW + "[CC_TAGS_LINK2][CC_TAGS]" + TagWithOutHash + "[CC_TAGS_LINK3]";
-		  Body = StringReplace(Body, TagWithHash, TagWithOutHashW, TReplaceFlags());
-		}
-	  }
-	  else Body = StringReplace(Body, "#", "[CC_TAGS]", TReplaceFlags());
-	}
-	Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"link:https://twitter.com/search?q=%23", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_TAGS_LINK2]", "&src=hash\">", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_TAGS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_TAGS]", "#", TReplaceFlags() << rfReplaceAll);
-
-	//Formatowanie u¿ytkownikow
-	while(Body.Pos("@"))
-	{
-	  //Zmienne tymczasowe
-	  UnicodeString TempStr = Body;
-	  UnicodeString TempStr2 = Body;
-	  //Sprawdzanie poprzedniego znaku/frazy
-	  TempStr.Delete(TempStr.Pos("@"),TempStr.Length());
-	  while(TempStr.Pos(" ")) TempStr.Delete(1,TempStr.Pos(" "));
-	  //Sprawdzanie kolejnego znaku
-	  TempStr2.Delete(1,TempStr2.Pos("@"));
-	  TempStr2.Delete(2,TempStr2.Length());
-	  //Jezeli fraza jest uzytkownikiem
-	  if((AllowedUsersCharacters(TempStr2))
-	   &&(TempStr.LowerCase().Pos("href=\"link:")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"http://")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"https://")==0)
-	   &&(TempStr.LowerCase().Pos("title=\"www")==0))
-	  {
-		//Usuwanie malpy z frazy
-		UnicodeString UserWithOutCaret = Body;
-		UserWithOutCaret.Delete(1,UserWithOutCaret.Pos("@"));
-		UserWithOutCaret.Delete(UsersCutPosition(UserWithOutCaret),UserWithOutCaret.Length());
-		//Fraza z malpa
-		UnicodeString UserWithCaret = "@" + UserWithOutCaret;
-		//Formatowanie linku
-		UserWithOutCaret = "[CC_USERS_LINK]" + UserWithOutCaret + "[CC_USERS_LINK2][CC_USERS]" + UserWithOutCaret + "[CC_USERS_LINK3]";
-		Body = StringReplace(Body, UserWithCaret, UserWithOutCaret, TReplaceFlags());
-	  }
-	  else Body = StringReplace(Body, "@", "[CC_USERS]", TReplaceFlags());
-	}
-	Body = StringReplace(Body, "[CC_USERS_LINK]", "<A HREF=\"link:https://twitter.com/", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_USERS_LINK2]", "\">", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_USERS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
-	Body = StringReplace(Body, "[CC_USERS]", "@", TReplaceFlags() << rfReplaceAll);
-
-	//Tworzenie odnosnika dla nadawcy wiadomosci
-	if(ContactJID==MessageJID)
-	{
-	  //Wyciagnie nadawcy wiadomosci
-	  UnicodeString TempStr = Body;
-	  TempStr.Delete(TempStr.Pos("):")+1,TempStr.Length());
-	  //Wyciagniecie loginu
-	  UnicodeString UserLogin = TempStr;
-	  UserLogin.Delete(1,UserLogin.Pos("("));
-	  UserLogin.Delete(UserLogin.Pos(")"),UserLogin.Length());
-	  TweetSender = UserLogin;
-	  //Wyciagniecie wyswietlanej nazwy
-	  UnicodeString DisplayName = TempStr;
-	  DisplayName.Delete(DisplayName.Pos("("),DisplayName.Length());
-	  DisplayName = DisplayName.Trim();
-	  //Tworzenie odnosnika
-	  Body = StringReplace(Body, TempStr + ":", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\" title=\"@" + UserLogin + "\">" + DisplayName + "</A></B>:", TReplaceFlags());
-	}
-
-	//Dodawanie awatarow
-	if((ContactJID==MessageJID)&&(!TweetSender.IsEmpty()))
-	{
-	  //Tworzenie katalogu z awatarami
-	  if(!DirectoryExists(AvatarsDir))
-	   CreateDir(AvatarsDir);
-      //Zmienna awataru
-	  UnicodeString Avatars;
-	  //Awatara nie ma w folderze cache
-	  if(!FileExists(AvatarsDir + "\\\\" + TweetSender))
-	  {
-		//Wstawienie online'owego awatara
-		Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://twitter.com/api/users/profile_image/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
-		//Dodanie awatara do pobrania
-		GetAvatarsList->Add(TweetSender);
-		//Wlaczenie watku
-		if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
-	  }
-	  //Awatar znajduje sie w folderze cache
-	  else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
-	  //Dodanie awatar(a/ow) do tresci wiadomosci
-	  Body = Avatars + Body;
-	}
-
-	//Wyroznianie wiadomosci
-	if(ContactJID==MessageJID)
-	{
-	  //Jezeli sa jakies elemnty do wyrozniania
-	  if(HighlightMsgItemsList->Count)
-	  {
-		//Petla wyrozniania wszystkich dodanych fraz
-		for(int Count=0;Count<HighlightMsgItemsList->Count;Count++)
-		{
-		  //Pobieranie danych odnosnie wyroznienia
-		  UnicodeString Item = HighlightMsgItemsList->Strings[Count];
-		  UnicodeString Color = HighlightMsgColorsList->ReadString("Color",Item,"");
-		  //Zmiana koloru tekstu (tryb I)
-		  if(HighlightMsgModeChk==0)
+	    //Zmienne tymczasowe
+	    UnicodeString TempStr = Body;
+	    UnicodeString TempStr2 = Body;
+	    //Sprawdzanie poprzedniego znaku/frazy
+	    TempStr.Delete(TempStr.Pos("#"),TempStr.Length());
+	    while(TempStr.Pos(" ")) TempStr.Delete(1,TempStr.Pos(" "));
+	    //Sprawdzanie kolejnego znaku
+	    TempStr2.Delete(1,TempStr2.Pos("#"));
+	    TempStr2.Delete(2,TempStr2.Length());
+	    //Jezeli fraza jest tagiem
+	    if((AllowedTagsCharacters(TempStr2))
+	     &&(TempStr.LowerCase().Pos("href=\"link:")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"http://")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"https://")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"www")==0))
+	    {
+		  //Usuwanie hasha z tagu
+		  UnicodeString TagWithOutHash = Body;
+		  TagWithOutHash.Delete(1,TagWithOutHash.Pos("#"));
+		  TagWithOutHash.Delete(TagsCutPosition(TagWithOutHash),TagWithOutHash.Length());
+		  //Usuwanie polskich znakow
+		  UnicodeString TagWithOutHashW = TagWithOutHash;
+		  TagWithOutHashW = TagWithOutHashW.LowerCase();
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "ê", "e", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "ó", "o", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "¹", "a", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "œ", "s", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "³", "l", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "¿", "z", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "Ÿ", "z", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "æ", "c", TReplaceFlags() << rfReplaceAll);
+		  TagWithOutHashW = StringReplace(TagWithOutHashW, "ñ", "n", TReplaceFlags() << rfReplaceAll);
+		  //Tworzenie tagu
+		  UnicodeString TagWithHash = "#" + TagWithOutHash;
+		  //Formatowanie tagu
+		  if((TagWithHash.Pos("-")==0)&&(TagWithHash.Pos("_")==0))
 		  {
-			//Wyrozanie tagow
-			if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-			{
-			  UnicodeString ItemBody = Body;
-			  ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-			  ItemBody.SetLength(1);
-			  if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+		    TagWithOutHashW = "[CC_TAGS_LINK]" + TagWithOutHashW + "[CC_TAGS_LINK2][CC_TAGS]" + TagWithOutHash + "[CC_TAGS_LINK3]";
+		    Body = StringReplace(Body, TagWithHash, TagWithOutHashW, TReplaceFlags());
+		  }
+		  else
+		  {
+		    TagWithOutHashW = StringReplace(TagWithOutHashW, "-", "", TReplaceFlags() << rfReplaceAll);
+		    TagWithOutHashW = StringReplace(TagWithOutHashW, "_", "", TReplaceFlags() << rfReplaceAll);
+		    TagWithOutHashW = "[CC_TAGS_LINK]" + TagWithOutHashW + "[CC_TAGS_LINK2][CC_TAGS]" + TagWithOutHash + "[CC_TAGS_LINK3]";
+		    Body = StringReplace(Body, TagWithHash, TagWithOutHashW, TReplaceFlags());
+		  }
+	    }
+	    else Body = StringReplace(Body, "#", "[CC_TAGS]", TReplaceFlags());
+	  }
+	  Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"link:https://twitter.com/search?q=%23", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_TAGS_LINK2]", "&src=hash\">", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_TAGS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_TAGS]", "#", TReplaceFlags() << rfReplaceAll);
+
+	  //Formatowanie u¿ytkownikow
+	  while(Body.Pos("@"))
+	  {
+	    //Zmienne tymczasowe
+	    UnicodeString TempStr = Body;
+	    UnicodeString TempStr2 = Body;
+	    //Sprawdzanie poprzedniego znaku/frazy
+	    TempStr.Delete(TempStr.Pos("@"),TempStr.Length());
+	    while(TempStr.Pos(" ")) TempStr.Delete(1,TempStr.Pos(" "));
+	    //Sprawdzanie kolejnego znaku
+	    TempStr2.Delete(1,TempStr2.Pos("@"));
+	    TempStr2.Delete(2,TempStr2.Length());
+	    //Jezeli fraza jest uzytkownikiem
+	    if((AllowedUsersCharacters(TempStr2))
+	     &&(TempStr.LowerCase().Pos("href=\"link:")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"http://")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"https://")==0)
+	     &&(TempStr.LowerCase().Pos("title=\"www")==0))
+	    {
+		  //Usuwanie malpy z frazy
+		  UnicodeString UserWithOutCaret = Body;
+		  UserWithOutCaret.Delete(1,UserWithOutCaret.Pos("@"));
+		  UserWithOutCaret.Delete(UsersCutPosition(UserWithOutCaret),UserWithOutCaret.Length());
+		  //Fraza z malpa
+		  UnicodeString UserWithCaret = "@" + UserWithOutCaret;
+		  //Formatowanie linku
+		  UserWithOutCaret = "[CC_USERS_LINK]" + UserWithOutCaret + "[CC_USERS_LINK2][CC_USERS]" + UserWithOutCaret + "[CC_USERS_LINK3]";
+		  Body = StringReplace(Body, UserWithCaret, UserWithOutCaret, TReplaceFlags());
+	    }
+	    else Body = StringReplace(Body, "@", "[CC_USERS]", TReplaceFlags());
+	  }
+	  Body = StringReplace(Body, "[CC_USERS_LINK]", "<A HREF=\"link:https://twitter.com/", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_USERS_LINK2]", "\">", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_USERS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_USERS]", "@", TReplaceFlags() << rfReplaceAll);
+
+	  //Tworzenie odnosnika dla nadawcy wiadomosci
+	  if(ContactJID==MessageJID)
+	  {
+	    //Wyciagnie nadawcy wiadomosci
+	    UnicodeString TempStr = Body;
+	    TempStr.Delete(TempStr.Pos("):")+1,TempStr.Length());
+	    //Wyciagniecie loginu
+	    UnicodeString UserLogin = TempStr;
+	    UserLogin.Delete(1,UserLogin.Pos("("));
+	    UserLogin.Delete(UserLogin.Pos(")"),UserLogin.Length());
+	    TweetSender = UserLogin;
+	    //Wyciagniecie wyswietlanej nazwy
+	    UnicodeString DisplayName = TempStr;
+	    DisplayName.Delete(DisplayName.Pos("("),DisplayName.Length());
+	    DisplayName = DisplayName.Trim();
+	    //Tworzenie odnosnika
+	    Body = StringReplace(Body, TempStr + ":", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\" title=\"@" + UserLogin + "\">" + DisplayName + "</A></B>:", TReplaceFlags());
+	  }
+
+	  //Dodawanie awatarow
+	  if((ContactJID==MessageJID)&&(!TweetSender.IsEmpty()))
+	  {
+	    //Tworzenie katalogu z awatarami
+	    if(!DirectoryExists(AvatarsDir))
+	     CreateDir(AvatarsDir);
+        //Zmienna awataru
+	    UnicodeString Avatars;
+	    //Awatara nie ma w folderze cache
+	    if(!FileExists(AvatarsDir + "\\\\" + TweetSender))
+	    {
+		  //Wstawienie online'owego awatara
+		  Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://twitter.com/api/users/profile_image/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+		  //Dodanie awatara do pobrania
+		  GetAvatarsList->Add(TweetSender);
+		  //Wlaczenie watku
+		  if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
+	    }
+	    //Awatar znajduje sie w folderze cache
+	    else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+	    //Dodanie awatar(a/ow) do tresci wiadomosci
+	    Body = Avatars + Body;
+	  }
+
+	  //Wyroznianie wiadomosci
+	  if(ContactJID==MessageJID)
+	  {
+	    //Jezeli sa jakies elemnty do wyrozniania
+	    if(HighlightMsgItemsList->Count)
+	    {
+		  //Petla wyrozniania wszystkich dodanych fraz
+		  for(int Count=0;Count<HighlightMsgItemsList->Count;Count++)
+		  {
+		    //Pobieranie danych odnosnie wyroznienia
+		    UnicodeString Item = HighlightMsgItemsList->Strings[Count];
+		    UnicodeString Color = HighlightMsgColorsList->ReadString("Color",Item,"");
+		    //Zmiana koloru tekstu (tryb I)
+		    if(HighlightMsgModeChk==0)
+		    {
+			  //Wyrozanie tagow
+			  if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
 			  {
-				Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    UnicodeString ItemBody = Body;
+			    ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
+			    ItemBody.SetLength(1);
+			    if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+			    {
+				  Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
 			  }
-			}
-			//Wyrozanianie uzytkownikow
-			else if(Item.Pos("@")==1)
-			{
+			  //Wyrozanianie uzytkownikow
+			  else if(Item.Pos("@")==1)
+			  {
+			    UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
+			    if((Body.LowerCase().Pos(Item.LowerCase()))
+			     ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
+			    {
+				  Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
+			  }
+			  //Wyrozanie dowolnych fraz
+			  else if(Body.LowerCase().Pos(Item.LowerCase()))
+			  {
+			    Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
+			    Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			  }
+		    }
+		    //Zmiana koloru tekstu (tryb II)
+		    else if(HighlightMsgModeChk==1)
+		    {
+			  //Wyrozanie tagow
+			  if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
+			  {
+			    UnicodeString ItemBody = Body;
+			    ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
+			    ItemBody.SetLength(1);
+			    if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+			    {
+				  UnicodeString SelectorID = "MSG" + MessageDate;
+				  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+				  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
+			  }
+			  //Wyrozanianie uzytkownikow
+			  else if(Item.Pos("@")==1)
+			  {
+			    UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
+			    if((Body.LowerCase().Pos(Item.LowerCase()))
+			     ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
+			    {
+				  UnicodeString SelectorID = "MSG" + MessageDate;
+				  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+				  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
+			  }
+			  //Wyrozanie dowolnych fraz
+			  else if(Body.LowerCase().Pos(Item.LowerCase()))
+			  {
+			    UnicodeString SelectorID = "MSG" + MessageDate;
+			    SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+			    Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
+			    Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			  }
+		    }
+		    //Zmiana koloru frazy
+		    else if(HighlightMsgModeChk==2)
+		    {
+			  //Wyrozanie tagow
+			  if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
+			  {
+			    UnicodeString ItemBody = Body;
+			    ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
+			    ItemBody.SetLength(1);
+			    if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+			    {
+				  UnicodeString SelectorID = "MSG" + MessageDate;
+				  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+				  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
+				  int Pos = Body.LowerCase().Pos(Item.LowerCase());
+				  Body = Body.Insert("</span>",Pos+Item.Length());
+				  Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
+			  }
+			  //Wyrozanie nadawcow wiadomosci
 			  UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-			  if((Body.LowerCase().Pos(Item.LowerCase()))
-			   ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
+			  if(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase())
 			  {
-				Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    UnicodeString SelectorID = "MSG" + MessageDate;
+			    SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+			    Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
+			    int Pos = Body.LowerCase().Pos((ItemWithOutCaret.LowerCase()+"</a>"));
+			    Body = Body.Insert("</span>",Pos+ItemWithOutCaret.Length());
+			    Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
+			    Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
 			  }
-			}
-			//Wyrozanie dowolnych fraz
-			else if(Body.LowerCase().Pos(Item.LowerCase()))
-			{
-			  Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-			  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			}
+			  //Wyroznianie zacytowanych uzytkownikow
+			  if(Body.LowerCase().Pos(Item.LowerCase()+"</a>"))
+			  {
+			    UnicodeString SelectorID = "MSG" + MessageDate;
+			    SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
+			    Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
+			    int Pos = Body.LowerCase().Pos(Item.LowerCase()+"</a>");
+			    Body = Body.Insert("</span>",Pos+Item.Length());
+			    Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
+			    Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			  }
+		    }
+		    //Zmiana koloru pola wiadomosci
+		    else if(HighlightMsgModeChk==3)
+		    {
+			  //Wyrozanie tagow
+			  if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
+			  {
+			    UnicodeString ItemBody = Body;
+			    ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
+			    ItemBody.SetLength(1);
+			    if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+			    {
+				  Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			    }
+			  }
+			  //Wyrozanianie uzytkownikow
+			  else if(Item.Pos("@")==1)
+			  {
+			    UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
+			    if((Body.LowerCase().Pos(Item.LowerCase()))
+			     ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
+			    {
+				  Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
+				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			  }  
+			  }
+			  //Wyrozanie dowolnych fraz
+			  else if(Body.LowerCase().Pos(Item.LowerCase()))
+			  {
+			    Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
+			    Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+			  }
+		    }
 		  }
-		  //Zmiana koloru tekstu (tryb II)
-		  else if(HighlightMsgModeChk==1)
-		  {
-			//Wyrozanie tagow
-			if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-			{
-			  UnicodeString ItemBody = Body;
-			  ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-			  ItemBody.SetLength(1);
-			  if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
-			  {
-				UnicodeString SelectorID = "MSG" + MessageDate;
-				SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-				Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }
-			}
-			//Wyrozanianie uzytkownikow
-			else if(Item.Pos("@")==1)
-			{
-			  UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-			  if((Body.LowerCase().Pos(Item.LowerCase()))
-			   ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
-			  {
-				UnicodeString SelectorID = "MSG" + MessageDate;
-				SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-				Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }
-			}
-			//Wyrozanie dowolnych fraz
-			else if(Body.LowerCase().Pos(Item.LowerCase()))
-			{
-			  UnicodeString SelectorID = "MSG" + MessageDate;
-			  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-			  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
-			  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			}
-		  }
-		  //Zmiana koloru frazy
-		  else if(HighlightMsgModeChk==2)
-		  {
-			//Wyrozanie tagow
-			if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-			{
-			  UnicodeString ItemBody = Body;
-			  ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-			  ItemBody.SetLength(1);
-			  if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
-			  {
-				UnicodeString SelectorID = "MSG" + MessageDate;
-				SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-				Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-				int Pos = Body.LowerCase().Pos(Item.LowerCase());
-				Body = Body.Insert("</span>",Pos+Item.Length());
-				Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }
-			}
-			//Wyrozanie nadawcow wiadomosci
-			UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-			if(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase())
-			{
-			  UnicodeString SelectorID = "MSG" + MessageDate;
-			  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-			  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-			  int Pos = Body.LowerCase().Pos((ItemWithOutCaret.LowerCase()+"</a>"));
-			  Body = Body.Insert("</span>",Pos+ItemWithOutCaret.Length());
-			  Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
-			  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			}
-			//Wyroznianie zacytowanych uzytkownikow
-			if(Body.LowerCase().Pos(Item.LowerCase()+"</a>"))
-			{
-			  UnicodeString SelectorID = "MSG" + MessageDate;
-			  SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-			  Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-			  int Pos = Body.LowerCase().Pos(Item.LowerCase()+"</a>");
-			  Body = Body.Insert("</span>",Pos+Item.Length());
-			  Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
-			  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			}
-		  }
-		  //Zmiana koloru pola wiadomosci
-		  else if(HighlightMsgModeChk==3)
-		  {
-			//Wyrozanie tagow
-			if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-			{
-			  UnicodeString ItemBody = Body;
-			  ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-			  ItemBody.SetLength(1);
-			  if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
-			  {
-				Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }
-			}
-			//Wyrozanianie uzytkownikow
-			else if(Item.Pos("@")==1)
-			{
-			  UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-			  if((Body.LowerCase().Pos(Item.LowerCase()))
-			   ||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
-			  {
-				Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-				Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }
-			}
-			//Wyrozanie dowolnych fraz
-			else if(Body.LowerCase().Pos(Item.LowerCase()))
-			{
-			  Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-			  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			}
-		  }
-		}
+	    }
 	  }
-	}
 
-	//Zwrocenie zmodyfikowanej wiadomosci
-	Message->Body = Body.w_str();
-	lParam = (LPARAM)Message;
-	return 2;
+	  //Zwrocenie zmodyfikowanej wiadomosci;
+	  AddLineMessage.Body = Body.w_str();
+	  memcpy((PPluginMessage)lParam,&AddLineMessage, sizeof(TPluginMessage));
+	  return 2;
+	}
+	//Zablokowanie zdublowanej wiadomosci
+	else return 1;
   }
 
   return 0;
@@ -1401,26 +1435,47 @@ int __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 {
   //Domyslne usuwanie elementow
+  TPluginAction InsertTagItem;
+  ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
   InsertTagItem.cbSize = sizeof(TPluginAction);
   InsertTagItem.pszName = L"tweetIMInsertTagItem";
+  InsertTagItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertTagItem));
+  TPluginAction InsertNickItem;
+  ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
   InsertNickItem.cbSize = sizeof(TPluginAction);
   InsertNickItem.pszName = L"tweetIMInsertNickItem";
+  InsertNickItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertNickItem));
+  TPluginAction SendPrivMsgItem;
+  ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
   SendPrivMsgItem.cbSize = sizeof(TPluginAction);
   SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
+  SendPrivMsgItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SendPrivMsgItem));
+  TPluginAction LikeLastTweetItem;
+  ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
   LikeLastTweetItem.cbSize = sizeof(TPluginAction);
   LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
+  LikeLastTweetItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
+  TPluginAction ShowTimelineItem;
+  ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
   ShowTimelineItem.cbSize = sizeof(TPluginAction);
   ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
+  ShowTimelineItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowTimelineItem));
+  TPluginAction ShowUserProfileItem;
+  ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
   ShowUserProfileItem.cbSize = sizeof(TPluginAction);
   ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
+  ShowUserProfileItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowUserProfileItem));
+  TPluginAction SeparatorItem;
+  ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
   SeparatorItem.cbSize = sizeof(TPluginAction);
   SeparatorItem.pszName = L"tweetIMSeparatorItem";
+  SeparatorItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SeparatorItem));
   //Kasowanie zapamietanych danych
   ItemCopyData = "";
@@ -1482,6 +1537,8 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		SeparatorItem.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SeparatorItem));
 		//Tworzenie elementu do pokazywania informacji o uzytkowniku
+		TPluginAction ShowUserProfileItem;
+		ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
 		ShowUserProfileItem.cbSize = sizeof(TPluginAction);
 		ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
 		ShowUserProfileItem.pszCaption = L"Poka¿ informacje o u¿ytkowniku";
@@ -1492,6 +1549,8 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		ShowUserProfileItem.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowUserProfileItem));
 		//Tworzenie elementu do pokazywania najnowszych tweetniec uzytkownika
+		TPluginAction ShowTimelineItem;
+		ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
 		ShowTimelineItem.cbSize = sizeof(TPluginAction);
 		ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
 		ShowTimelineItem.pszCaption = L"Poka¿ najnowsze tweetniêcia";
@@ -1502,6 +1561,8 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		ShowTimelineItem.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowTimelineItem));
 		//Tworzenie elementu lajkowania ostatniego tweetniecia
+		TPluginAction LikeLastTweetItem;
+		ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
 		LikeLastTweetItem.cbSize = sizeof(TPluginAction);
 		LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
 		LikeLastTweetItem.pszCaption = L"Polub ostatnie tweetniêcie";
@@ -1512,6 +1573,8 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		LikeLastTweetItem.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&LikeLastTweetItem));
 		//Tworzenie elementu wysylania prywatnej wiadomosci
+		TPluginAction SendPrivMsgItem;
+  		ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
 		SendPrivMsgItem.cbSize = sizeof(TPluginAction);
 		SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
 		SendPrivMsgItem.pszCaption = L"Wiadomoœæ prywatna";
@@ -1522,6 +1585,8 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		SendPrivMsgItem.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SendPrivMsgItem));
 		//Tworzenie elementu wstawiania nicku
+		TPluginAction InsertNickItem;
+  		ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
 		InsertNickItem.cbSize = sizeof(TPluginAction);
 		InsertNickItem.pszName = L"tweetIMInsertNickItem";
 		InsertNickItem.pszCaption = ("Wstaw @" + ItemCopyData).w_str();
@@ -1546,10 +1611,10 @@ int __stdcall OnPrimaryTab (WPARAM wParam, LPARAM lParam)
   //Szukanie pola wiadomosci
   if(!hRichEdit) EnumChildWindows(hFrmSend,(WNDENUMPROC)FindRichEdit,0);
   //Pobieranie danych kontatku
-  PrimaryTabContact = (PPluginContact)lParam;
-  ActiveTabJID = (wchar_t*)PrimaryTabContact->JID;
-  ActiveTabRes = (wchar_t*)PrimaryTabContact->Resource;
-  ActiveTabUsrIdx = PrimaryTabContact->UserIdx;
+  TPluginContact PrimaryTabContact = *(PPluginContact)lParam;
+  ActiveTabJID = (wchar_t*)PrimaryTabContact.JID;
+  ActiveTabRes = (wchar_t*)PrimaryTabContact.Resource;
+  ActiveTabUsrIdx = PrimaryTabContact.UserIdx;
   //Kontakt jest botem tweet.IM
   if(ActiveTabJID.Pos("@twitter.tweet.im"))
   {
@@ -1729,6 +1794,8 @@ extern "C" int __declspec(dllexport) __stdcall Load(PPluginLink Link)
   if(!DirectoryExists(AvatarsDir))
    CreateDir(AvatarsDir);
   //Tworzenie PopUpMenu
+  TPluginAction CommandPopUp;
+  ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
   CommandPopUp.cbSize = sizeof(TPluginAction);
   CommandPopUp.pszName = L"tweetIMCommandPopUp";
   PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENU,0,(LPARAM)(&CommandPopUp));
@@ -1805,49 +1872,87 @@ extern "C" int __declspec(dllexport) __stdcall Unload()
   PluginLink.UnhookEvent(OnPerformCopyData);
   PluginLink.UnhookEvent(OnThemeChanged);
   //Usuwanie elementow z interfejsu AQQ
+  TPluginAction FastSettingsItem;
+  ZeroMemory(&FastSettingsItem,sizeof(TPluginAction));
   FastSettingsItem.cbSize = sizeof(TPluginAction);
   FastSettingsItem.pszName = L"tweetIMFastSettingsItemButton";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM,0,(LPARAM)(&FastSettingsItem));
+  TPluginAction InsertTagItem;
+  ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
   InsertTagItem.cbSize = sizeof(TPluginAction);
   InsertTagItem.pszName = L"tweetIMInsertTagItem";
+  InsertTagItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertTagItem));
+  TPluginAction InsertNickItem;
+  ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
   InsertNickItem.cbSize = sizeof(TPluginAction);
   InsertNickItem.pszName = L"tweetIMInsertNickItem";
+  InsertNickItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertNickItem));
+  TPluginAction SendPrivMsgItem;
+  ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
   SendPrivMsgItem.cbSize = sizeof(TPluginAction);
   SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
+  SendPrivMsgItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SendPrivMsgItem));
+  TPluginAction LikeLastTweetItem;
+  ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
   LikeLastTweetItem.cbSize = sizeof(TPluginAction);
   LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
+  LikeLastTweetItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
+  TPluginAction ShowTimelineItem;
+  ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
   ShowTimelineItem.cbSize = sizeof(TPluginAction);
   ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
+  ShowTimelineItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowTimelineItem));
+  TPluginAction ShowUserProfileItem;
+  ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
   ShowUserProfileItem.cbSize = sizeof(TPluginAction);
   ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
+  ShowUserProfileItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowUserProfileItem));
+  TPluginAction SeparatorItem;
+  ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
   SeparatorItem.cbSize = sizeof(TPluginAction);
   SeparatorItem.pszName = L"tweetIMSeparatorItem";
+  SeparatorItem.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SeparatorItem));
+  TPluginAction UpdateCommandItem;
+  ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
   UpdateCommandItem.cbSize = sizeof(TPluginAction);
   UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UpdateCommandItem));
+  TPluginAction IngCommandItem;
+  ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
   IngCommandItem.cbSize = sizeof(TPluginAction);
   IngCommandItem.pszName = L"tweetIMIngCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&IngCommandItem));
+  TPluginAction ErsCommandItem;
+  ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
   ErsCommandItem.cbSize = sizeof(TPluginAction);
   ErsCommandItem.pszName = L"tweetIMErsCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
+  TPluginAction UndoTweetCommandItem;
+  ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
   UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
   UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
+  TPluginAction SavedSearchesCommandItem;
+  ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
   SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
   SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
+  TPluginAction CommandButton;
+  ZeroMemory(&CommandButton,sizeof(TPluginAction));
   CommandButton.cbSize = sizeof(TPluginAction);
   CommandButton.pszName = L"tweetIMCommandButton";
+  CommandButton.Handle = (int)hFrmSend;
   PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_DESTROYBUTTON ,0,(LPARAM)(&CommandButton));
   //Usuwanie PopUpMenu
+  TPluginAction CommandPopUp;
+  ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
   CommandPopUp.cbSize = sizeof(TPluginAction);
   CommandPopUp.pszName = L"tweetIMCommandPopUp";
   PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENU,0,(LPARAM)(&CommandPopUp));
@@ -1890,7 +1995,7 @@ extern "C" __declspec(dllexport) PPluginInfo __stdcall AQQPluginInfo(DWORD AQQVe
 {
   PluginInfo.cbSize = sizeof(TPluginInfo);
   PluginInfo.ShortName = L"tweet.IM";
-  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,0,0,0);
+  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,0,1,0);
   PluginInfo.Description = L"Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.";
   PluginInfo.Author = L"Krzysztof Grochocki (Beherit)";
   PluginInfo.AuthorMail = L"kontakt@beherit.pl";
