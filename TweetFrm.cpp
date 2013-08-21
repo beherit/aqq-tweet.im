@@ -189,6 +189,69 @@ bool __fastcall TTweetForm::AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeStr
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TTweetForm::FormCreate(TObject *Sender)
+{
+  //Hack na blad w AC
+  #if defined(_WIN64)
+  HighlightMsgListView->SkinData->SkinSection = "";
+  #endif
+  //Wlaczona zaawansowana stylizacja okien
+  if(ChkSkinEnabled())
+  {
+	UnicodeString ThemeSkinDir = GetThemeSkinDir();
+	//Plik zaawansowanej stylizacji okien istnieje
+	if(FileExists(ThemeSkinDir + "\\\\Skin.asz"))
+	{
+	  //Dane pliku zaawansowanej stylizacji okien
+	  ThemeSkinDir = StringReplace(ThemeSkinDir, "\\\\", "\\", TReplaceFlags() << rfReplaceAll);
+	  sSkinManager->SkinDirectory = ThemeSkinDir;
+	  sSkinManager->SkinName = "Skin.asz";
+	  //Ustawianie animacji AlphaControls
+	  if(ChkThemeAnimateWindows()) sSkinManager->AnimEffects->FormShow->Time = 200;
+	  else sSkinManager->AnimEffects->FormShow->Time = 0;
+	  sSkinManager->Effects->AllowGlowing = ChkThemeGlowing();
+	  //Zmiana kolorystyki AlphaControls
+	  sSkinManager->HueOffset = GetHUE();
+	  sSkinManager->Saturation = GetSaturation();
+	  //Aktywacja skorkowania AlphaControls
+	  sSkinManager->Active = true;
+	}
+	//Brak pliku zaawansowanej stylizacji okien
+	else sSkinManager->Active = false;
+  }
+  //Zaawansowana stylizacja okien wylaczona
+  else sSkinManager->Active = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TTweetForm::FormShow(TObject *Sender)
+{
+  //Wlaczona zaawansowana stylizacja okien
+  if(sSkinManager->Active)
+  {
+	//Kolor labelow
+	UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
+	LastAvatarsUpdateLabel->Kind->Color = UsedAvatarsStyleLabel->Kind->Color;
+  }
+  //Zaawansowana stylizacja okien wylaczona
+  else
+  {
+	//Kolor labelow
+	UsedAvatarsStyleLabel->Kind->Color = clGreen;
+	LastAvatarsUpdateLabel->Kind->Color = clGreen;
+  }
+  //Odczyt ustawien wtyczki
+  aLoadSettings->Execute();
+  //Wlaczanie przyciskow
+  SaveButton->Enabled = false;
+  //Ustawienie domyslnie wlaczonej karty ustawien
+  sPageControl->ActivePage = AvatarsTabSheet;
+  //Ustawienie kontrolek
+  AvatarsStyleGroupBox->Height = 42;
+  EditAvatarsStyleLabel->Caption = "(edytuj)";
+}
+//---------------------------------------------------------------------------
+
 void __fastcall TTweetForm::aLoadSettingsExecute(TObject *Sender)
 {
   TIniFile *Ini = new TIniFile( GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
@@ -284,66 +347,6 @@ void __fastcall TTweetForm::aForceDisconnectExecute(TObject *Sender)
 void __fastcall TTweetForm::aExitExecute(TObject *Sender)
 {
   Close();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TTweetForm::FormCreate(TObject *Sender)
-{
-  //Hack na blad w AC
-  #if defined(_WIN64)
-  HighlightMsgListView->SkinData->SkinSection = "";
-  #endif
-  //Wlaczona zaawansowana stylizacja okien
-  if(ChkSkinEnabled())
-  {
-	UnicodeString ThemeSkinDir = GetThemeSkinDir();
-	//Plik zaawansowanej stylizacji okien istnieje
-	if(FileExists(ThemeSkinDir + "\\\\Skin.asz"))
-	{
-	  ThemeSkinDir = StringReplace(ThemeSkinDir, "\\\\", "\\", TReplaceFlags() << rfReplaceAll);
-	  sSkinManager->SkinDirectory = ThemeSkinDir;
-	  sSkinManager->SkinName = "Skin.asz";
-	  if(ChkThemeAnimateWindows()) sSkinManager->AnimEffects->FormShow->Time = 200;
-	  else sSkinManager->AnimEffects->FormShow->Time = 0;
-	  sSkinManager->Effects->AllowGlowing = ChkThemeGlowing();
-	  sSkinManager->Active = true;
-	}
-	//Brak pliku zaawansowanej stylizacji okien
-	else sSkinManager->Active = false;
-  }
-  //Zaawansowana stylizacja okien wylaczona
-  else sSkinManager->Active = false;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TTweetForm::FormShow(TObject *Sender)
-{
-  //Wlaczona zaawansowana stylizacja okien
-  if(sSkinManager->Active)
-  {
-	//Kolor labelow
-	UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
-	LastAvatarsUpdateLabel->Kind->Color = UsedAvatarsStyleLabel->Kind->Color;
-    //Zmiana kolorystyki AlphaControls
-	sSkinManager->HueOffset = GetHUE();
-	sSkinManager->Saturation = GetSaturation();
-  }
-  //Zaawansowana stylizacja okien wylaczona
-  else
-  {
-	//Kolor labelow
-	UsedAvatarsStyleLabel->Kind->Color = clGreen;
-	LastAvatarsUpdateLabel->Kind->Color = clGreen;
-  }
-  //Odczyt ustawien wtyczki
-  aLoadSettings->Execute();
-  //Wlaczanie przyciskow
-  SaveButton->Enabled = false;
-  //Ustawienie domyslnie wlaczonej karty ustawien
-  sPageControl->ActivePage = AvatarsTabSheet;
-  //Ustawienie kontrolek
-  AvatarsStyleGroupBox->Height = 42;
-  EditAvatarsStyleLabel->Caption = "(edytuj)";
 }
 //---------------------------------------------------------------------------
 
