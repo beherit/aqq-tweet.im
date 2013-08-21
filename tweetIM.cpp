@@ -62,7 +62,8 @@ HWND hFrmSend;
 //Uchwyt do pola RichEdit
 HWND hRichEdit;
 //Ostatnio wyswietlona wiadomosci od bota
-UnicodeString LastBody;
+TCustomIniFile* LastAddLineBody = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
+TCustomIniFile* LastRecvMsgBody = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
 //SETTINGS-------------------------------------------------------------------
 int AvatarSize;
 UnicodeString StaticAvatarStyle;
@@ -77,6 +78,7 @@ int __stdcall OnColorChange(WPARAM wParam, LPARAM lParam);
 int __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam);
 int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam);
 int __stdcall OnPrimaryTab(WPARAM wParam, LPARAM lParam);
+int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam);
 int __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam);
 int __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam);
 int __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam);
@@ -1082,10 +1084,10 @@ int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	UnicodeString Body = (wchar_t*)AddLineMessage.Body;
 	Body = Body.Trim();
 	//Zabezpieczenie przed bledem bota - dublowanie wiadomosci
-	if(Body!=LastBody)
+	if(Body!=LastAddLineBody->ReadString("Body",ContactJID,""))
 	{
 	  //Zapamietanie wiadomosci
-	  LastBody = Body;
+	  LastAddLineBody->WriteString("Body",ContactJID,Body);
 	  //Non-breaking space
   	  if(Body.Pos("&#12288;")) Body = StringReplace(Body, "&#12288;", " ", TReplaceFlags() << rfReplaceAll);
 	  //Formatowanie tagow
@@ -1635,6 +1637,32 @@ int __stdcall OnPrimaryTab (WPARAM wParam, LPARAM lParam)
 }
 //---------------------------------------------------------------------------
 
+//Hook na odbieranie wiadomosci
+int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
+{
+  //Pobieranie danych kontatku
+  TPluginContact RecvMsgContact = *(PPluginContact)wParam;
+  //Pobieranie identyfikatora kontatku
+  UnicodeString ContactJID = (wchar_t*)RecvMsgContact.JID;
+  //Kontakt jest botem tweet.IM
+  if(ContactJID.Pos("@twitter.tweet.im"))
+  {
+	//Pobieranie danych wiadomosci
+	TPluginMessage RecvMsgMessage = *(PPluginMessage)lParam;
+	//Pobranie tresci wiadomosci
+	UnicodeString Body = (wchar_t*)RecvMsgMessage.Body;
+	//Zabezpieczenie przed bledem bota - dublowanie wiadomosci
+	if(Body!=LastRecvMsgBody->ReadString("Body",ContactJID,""))
+	 //Zapamietanie wiadomosci
+	 LastRecvMsgBody->WriteString("Body",ContactJID,Body);
+	//Blokada wiadomosci
+	else return 1;
+  }
+
+  return 0;
+}
+//---------------------------------------------------------------------------
+
 //Hook na zmiane kompozycji (pobranie stylu zalacznikow oraz zmiana skorkowania wtyczki)
 int __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 {
@@ -1649,12 +1677,18 @@ int __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 	  //Plik zaawansowanej stylizacji okien istnieje
 	  if(FileExists(ThemeSkinDir + "\\\\Skin.asz"))
 	  {
+		//Dane pliku zaawansowanej stylizacji okien
 		ThemeSkinDir = StringReplace(ThemeSkinDir, "\\\\", "\\", TReplaceFlags() << rfReplaceAll);
 		hTweetForm->sSkinManager->SkinDirectory = ThemeSkinDir;
 		hTweetForm->sSkinManager->SkinName = "Skin.asz";
+		//Ustawianie animacji AlphaControls
 		if(ChkThemeAnimateWindows()) hTweetForm->sSkinManager->AnimEffects->FormShow->Time = 200;
 		else hTweetForm->sSkinManager->AnimEffects->FormShow->Time = 0;
 		hTweetForm->sSkinManager->Effects->AllowGlowing = ChkThemeGlowing();
+		//Zmiana kolorystyki AlphaControls
+		hTweetForm->sSkinManager->HueOffset = GetHUE();
+	    hTweetForm->sSkinManager->Saturation = GetSaturation();
+		//Aktywacja skorkowania AlphaControls
 		hTweetForm->sSkinManager->Active = true;
 	  }
 	  //Brak pliku zaawansowanej stylizacji okien
@@ -1839,6 +1873,8 @@ extern "C" int __declspec(dllexport) __stdcall Load(PPluginLink Link)
   PluginLink.HookEvent(AQQ_SYSTEM_MODULESLOADED,OnModulesLoaded);
   //Hook na pobieranie adresow URL z roznych popup (tworzenie itemow w popup menu do akcji z tweetami)
   PluginLink.HookEvent(AQQ_SYSTEM_PERFORM_COPYDATA,OnPerformCopyData);
+  //Hook na odbieranie nowej wiadomosci
+  PluginLink.HookEvent(AQQ_CONTACTS_RECVMSG,OnRecvMsg);
   //Hook na zmiane kompozycji (pobranie stylu zalacznikow oraz zmiana skorkowania wtyczki)
   PluginLink.HookEvent(AQQ_SYSTEM_THEMECHANGED,OnThemeChanged);
   //Odczyt ustawien
@@ -1870,6 +1906,7 @@ extern "C" int __declspec(dllexport) __stdcall Unload()
   PluginLink.UnhookEvent(OnColorChange);
   PluginLink.UnhookEvent(OnModulesLoaded);
   PluginLink.UnhookEvent(OnPerformCopyData);
+  PluginLink.UnhookEvent(OnRecvMsg);
   PluginLink.UnhookEvent(OnThemeChanged);
   //Usuwanie elementow z interfejsu AQQ
   TPluginAction FastSettingsItem;
@@ -1995,7 +2032,7 @@ extern "C" __declspec(dllexport) PPluginInfo __stdcall AQQPluginInfo(DWORD AQQVe
 {
   PluginInfo.cbSize = sizeof(TPluginInfo);
   PluginInfo.ShortName = L"tweet.IM";
-  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,0,1,0);
+  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,0,2,0);
   PluginInfo.Description = L"Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.";
   PluginInfo.Author = L"Krzysztof Grochocki (Beherit)";
   PluginInfo.AuthorMail = L"kontakt@beherit.pl";
