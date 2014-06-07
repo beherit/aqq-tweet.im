@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013 Krzysztof Grochocki
+// Copyright (C) 2013-2014 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -46,8 +46,6 @@ TPluginInfo PluginInfo;
 UnicodeString ActiveTabJID;
 UnicodeString ActiveTabRes;
 int ActiveTabUsrIdx;
-//Styl zalacznika
-UnicodeString AttachmentStyle;
 //Awatary
 TStringList *GetAvatarsList = new TStringList;
 UnicodeString AvatarStyle;
@@ -72,26 +70,40 @@ int HighlightMsgModeChk;
 TStringList *HighlightMsgItemsList = new TStringList;
 TCustomIniFile* HighlightMsgColorsList = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
 //FORWARD-AQQ-HOOKS----------------------------------------------------------
-int __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam);
-int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam);
-int __stdcall OnColorChange(WPARAM wParam, LPARAM lParam);
-int __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam);
-int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam);
-int __stdcall OnPrimaryTab(WPARAM wParam, LPARAM lParam);
-int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam);
-int __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam);
-int __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam);
-int __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnPrimaryTab(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam);
+//---------------------------------------------------------------------------
+
+//Otwarcie okna ustawien
+void OpenSettingsForm()
+{
+  //Przypisanie uchwytu do formy ustawien
+  if(!hTweetForm)
+  {
+	Application->Handle = (HWND)TweetForm;
+	hTweetForm = new TTweetForm(Application);
+  }
+  //Pokaznie okna ustawien
+  hTweetForm->Show();
+}
 //---------------------------------------------------------------------------
 
 //Szukanie uchwytu do kontrolki TsRichEdit
@@ -108,79 +120,6 @@ bool CALLBACK FindRichEdit(HWND hWnd, LPARAM)
 	return false;
   }
   return true;
-}
-//---------------------------------------------------------------------------
-
-//Konwersja ciagu znakow na potrzeby INI
-UnicodeString StrToIniStr(UnicodeString Str)
-{
-  //Definicja zmiennych
-  wchar_t Buffer[50010];
-  wchar_t* B;
-  wchar_t* S;
-  //Przekazywanie ciagu znakow
-  S = Str.w_str();
-  //Ustalanie wskaznika
-  B = Buffer;
-  //Konwersja znakow
-  while(*S!='\0')
-  {
-	switch(*S)
-	{
-	  case 13:
-	  case 10:
-		if((*S==13)&&(S[1]==10)) S++;
-		else if((*S==10)&&(S[1] == 13)) S++;
-		*B = '\\';
-		B++;
-		*B = 'n';
-		B++;
-		S++;
-	  break;
-	  default:
-		*B = *S;
-		B++;
-		S++;
-	  break;
-	}
-  }
-  *B = '\0';
-  //Zwracanie zkonwertowanego ciagu znakow
-  return (wchar_t*)Buffer;
-}
-//---------------------------------------------------------------------------
-UnicodeString IniStrToStr(UnicodeString Str)
-{
-  //Definicja zmiennych
-  wchar_t Buffer[50010];
-  wchar_t* B;
-  wchar_t* S;
-  //Przekazywanie ciagu znakow
-  S = Str.w_str();
-  //Ustalanie wskaznika
-  B = Buffer;
-  //Konwersja znakow
-  while(*S!='\0')
-  {
-	if((S[0]=='\\')&&(S[1]=='n'))
-	{
-	  *B = 13;
-	  B++;
-	  *B = 10;
-	  B++;
-	  S++;
-	  S++;
-	}
-	else
-	{
-	  *B = *S;
-	  B++;
-	  S++;
-	}
-  }
-  *B = '\0';
-  //Zwracanie zkonwertowanego ciagu znakow
-  return (wchar_t*)Buffer;
 }
 //---------------------------------------------------------------------------
 
@@ -276,6 +215,20 @@ int GetSaturation()
 }
 //---------------------------------------------------------------------------
 
+//Kodowanie ciagu znakow do Base64
+UnicodeString EncodeBase64(UnicodeString Str)
+{
+  return (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_BASE64,(WPARAM)Str.w_str(),3);
+}
+//---------------------------------------------------------------------------
+
+//Dekodowanie ciagu znakow z Base64
+UnicodeString DecodeBase64(UnicodeString Str)
+{
+  return (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_BASE64,(WPARAM)Str.w_str(),2);
+}
+//---------------------------------------------------------------------------
+
 //Pobranie stylu labela
 TColor GetWarningColor()
 {
@@ -352,69 +305,10 @@ UnicodeString GetFileInfo(wchar_t *ModulePath, String KeyName)
 }
 //---------------------------------------------------------------------------
 
-//Sprawdzanie czy przekazany znak jest dozwolony
-bool AllowedTagsCharacters(UnicodeString Text)
-{
-  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","_","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
-  for(int Char=0;Char<34;Char++)
-  {
-	if(Text.Pos(Characters[Char])>0) return false;
-  }
-  return true;
-}
-//---------------------------------------------------------------------------
-
-//Sprawdzanie czy przekazany znak jest dozwolony
-bool AllowedUsersCharacters(UnicodeString Text)
-{
-  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
-  for(int Char=0;Char<33;Char++)
-  {
-	if(Text.Pos(Characters[Char])>0) return false;
-  }
-  return true;
-}
-//---------------------------------------------------------------------------
-
-//Zwracanie pozycji uciecia tagu
-int TagsCutPosition(UnicodeString Text)
-{
-  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
-  int xPos = Text.Length()+1;
-  int yPos;
-  for(int Char=0;Char<32;Char++)
-  {
-	yPos = Text.Pos(Characters[Char]);
-	if((yPos<xPos)&&(yPos!=0)) xPos = yPos;
-  }
-  return xPos;
-}
-//---------------------------------------------------------------------------
-
-//Zwracanie pozycji uciecia uzytkownika Twittera
-int UsersCutPosition(UnicodeString Text)
-{
-  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
-  int xPos = Text.Length()+1;
-  int yPos;
-  for(int Char=0;Char<33;Char++)
-  {
-	yPos = Text.Pos(Characters[Char]);
-	if((yPos<xPos)&&(yPos!=0)) xPos = yPos;
-  }
-  return xPos;
-}
-//---------------------------------------------------------------------------
-
-//Pobranie stylu Attachment & Avatars
+//Pobranie stylu awatarow
 void GetThemeStyle()
 {
-  //Bufer odczytu plikow
-  char FileBuffer[1024];
-  int FileLength;
-  int CurrentLength;
-  //Reset stylow
-  AttachmentStyle = "";
+  //Reset stylu
   AvatarStyle = "";
   //URL do aktuanie uzywanej kompozycji
   UnicodeString ThemeURL = GetThemeDir();
@@ -422,26 +316,6 @@ void GetThemeStyle()
   UnicodeString ThemeURLW = (wchar_t*)(PluginLink.CallService(AQQ_FUNCTION_GETAPPPATH,0,0));
   ThemeURLW = StringReplace(ThemeURLW, "\\", "\\\\", TReplaceFlags() << rfReplaceAll);
   ThemeURLW = ThemeURLW + "\\\\System\\\\Shared\\\\Themes\\\\Standard";
-  //Pobieranie stylu wiadomosci
-  if(FileExists(ThemeURL + "\\\\Message\\\\In.htm"))
-   hTweetForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\In.htm");
-  else
-   hTweetForm->FileMemo->Lines->LoadFromFile(ThemeURLW + "\\\\Message\\\\In.htm");
-  AttachmentStyle = hTweetForm->FileMemo->Text;
-  //Formatowanie
-  AttachmentStyle.Delete(1,AttachmentStyle.Pos("CC_TEXT")+6);
-  //Styl zalacznika
-  if(FileExists(ThemeURL + "\\\\Message\\\\Attachment.htm"))
-   hTweetForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\Attachment.htm");
-  else
-   hTweetForm->FileMemo->Lines->LoadFromFile(ThemeURLW + "\\\\Message\\\\Attachment.htm");
-  AttachmentStyle = AttachmentStyle + hTweetForm->FileMemo->Text;
-  //Formatowanie
-  AttachmentStyle = StringReplace(AttachmentStyle, "CC_DAYNAME :: CC_TIME", "", TReplaceFlags() << rfReplaceAll);
-  AttachmentStyle = StringReplace(AttachmentStyle, "CC_DAYNAME", "", TReplaceFlags() << rfReplaceAll);
-  AttachmentStyle = StringReplace(AttachmentStyle, "CC_TIME", "", TReplaceFlags() << rfReplaceAll);
-  AttachmentStyle = StringReplace(AttachmentStyle, "CC_SMARTDATE", "", TReplaceFlags() << rfReplaceAll);
-  AttachmentStyle = AttachmentStyle.Trim();
   //Pobieranie stylu awatarow
   if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))
   {
@@ -560,10 +434,13 @@ void AutoAvatarsUpdate()
 	  hTweetForm->ProgressBar->Visible = true;
 	  hTweetForm->ProgressLabel->Caption = "Pobieranie danych...";
 	  hTweetForm->ProgressLabel->Visible = true;
+	  //Wlaczenie paska postepu na taskbarze
+	  hTweetForm->Taskbar->ProgressValue = 0;
+	  hTweetForm->Taskbar->ProgressState = TTaskBarProgressState::Normal;
 	  //Pobieranie listy plikow
 	  hTweetForm->FileListBox->Directory = "";
 	  hTweetForm->FileListBox->Directory = GetPluginUserDirW() + "\\tweetIM\\Avatars";
-	  //Ignoowanie plikow *.tmp
+	  //Ignorowanie plikow *.tmp i plikow ze spacja (np. konflikty stworzone przez Dropbox'a)
 	  for(int Count=0;Count<hTweetForm->FileListBox->Items->Count;Count++)
 	  {
 		if(ExtractFileName(hTweetForm->FileListBox->Items->Strings[Count]).Pos(".tmp")>0)
@@ -571,11 +448,18 @@ void AutoAvatarsUpdate()
 		  DeleteFile(hTweetForm->FileListBox->Items->Strings[Count]);
 		  hTweetForm->FileListBox->Items->Strings[Count] ="TMP_DELETE";
 		}
+		else if(ExtractFileName(hTweetForm->FileListBox->Items->Strings[Count]).Pos(" ")>0)
+		{
+		  DeleteFile(hTweetForm->FileListBox->Items->Strings[Count]);
+		  hTweetForm->FileListBox->Items->Strings[Count] = "TMP_DELETE";
+		}
 	  }
 	  while(hTweetForm->FileListBox->Items->IndexOf("TMP_DELETE")!=-1)
 	   hTweetForm->FileListBox->Items->Delete(hTweetForm->FileListBox->Items->IndexOf("TMP_DELETE"));
 	  //Ustawianie maksymalnego paska postepu
 	  hTweetForm->ProgressBar->Max = hTweetForm->FileListBox->Items->Count;
+	  //Ustawianie maksymalnego paska postepu na taskbarze
+	  hTweetForm->Taskbar->ProgressMaxValue = hTweetForm->FileListBox->Items->Count;
 	  //Wlacznie aktualizacji
 	  hTweetForm->AutoAvatarsUpdateThread->Start();
 	}
@@ -603,6 +487,60 @@ UnicodeString GetAvatarsListItem()
 }
 //---------------------------------------------------------------------------
 
+//Sprawdzanie czy przekazany znak jest dozwolony
+bool AllowedTagsCharacters(UnicodeString Text)
+{
+  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","_","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
+  for(int Char=0;Char<34;Char++)
+  {
+	if(Text.Pos(Characters[Char])>0) return false;
+  }
+  return true;
+}
+//---------------------------------------------------------------------------
+
+//Sprawdzanie czy przekazany znak jest dozwolony
+bool AllowedUsersCharacters(UnicodeString Text)
+{
+  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
+  for(int Char=0;Char<33;Char++)
+  {
+	if(Text.Pos(Characters[Char])>0) return false;
+  }
+  return true;
+}
+//---------------------------------------------------------------------------
+
+//Zwracanie pozycji uciecia tagu
+int TagsCutPosition(UnicodeString Text)
+{
+  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
+  int xPos = Text.Length()+1;
+  int yPos;
+  for(int Char=0;Char<32;Char++)
+  {
+	yPos = Text.Pos(Characters[Char]);
+	if((yPos<xPos)&&(yPos!=0)) xPos = yPos;
+  }
+  return xPos;
+}
+//---------------------------------------------------------------------------
+
+//Zwracanie pozycji uciecia uzytkownika Twittera
+int UsersCutPosition(UnicodeString Text)
+{
+  UnicodeString Characters[] = {" ","!","@","#","$","%","^","&","*","(",")","-","=","+","[","{","]","}",":",";","'",'"',"<",",",">",".","?","/","\\","|","`","~","’"};
+  int xPos = Text.Length()+1;
+  int yPos;
+  for(int Char=0;Char<33;Char++)
+  {
+	yPos = Text.Pos(Characters[Char]);
+	if((yPos<xPos)&&(yPos!=0)) xPos = yPos;
+  }
+  return xPos;
+}
+//---------------------------------------------------------------------------
+
 //Tworzenie elementu szybkiego dostepu do ustawien wtyczki
 void BuildtweetIMFastSettings()
 {
@@ -621,23 +559,17 @@ void BuildtweetIMFastSettings()
 //---------------------------------------------------------------------------
 
 //Serwis szybkiego dostepu do ustawien wtyczki
-int __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam)
 {
-  //Przypisanie uchwytu do formy ustawien
-  if(!hTweetForm)
-  {
-	Application->Handle = (HWND)TweetForm;
-	hTweetForm = new TTweetForm(Application);
-  }
-  //Pokaznie okna ustawien
-  hTweetForm->Show();
+  //Otwarcie okna ustawien
+  OpenSettingsForm();
 
   return 0;
 }
 //---------------------------------------------------------------------------
 
 //Serwis do wstawiania tagu
-int __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam)
 {
   //Szukanie pola wiadomosci
   if(!hRichEdit) EnumChildWindows(hFrmSend,(WNDENUMPROC)FindRichEdit,0);
@@ -666,7 +598,7 @@ int __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do wstawiania nicku
-int __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam)
 {
   //Szukanie pola wiadomosci
   if(!hRichEdit) EnumChildWindows(hFrmSend,(WNDENUMPROC)FindRichEdit,0);
@@ -695,7 +627,7 @@ int __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do wysylania prywarnej wiadomosci
-int __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam)
 {
   //Szukanie pola wiadomosci
   if(!hRichEdit) EnumChildWindows(hFrmSend,(WNDENUMPROC)FindRichEdit,0);
@@ -728,7 +660,7 @@ int __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do lajkowania ostatniego tweetniecia
-int __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -751,7 +683,7 @@ int __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do pokazywania najnowszych tweetniec uzytkownika
-int __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -774,7 +706,7 @@ int __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do pokazywania informacji o uzytkowniku
-int __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -797,7 +729,7 @@ int __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do "Pobierz nieprzeczytane tweet"
-int __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -820,7 +752,7 @@ int __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do "Obserwuj¹cy"
-int __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -843,7 +775,7 @@ int __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do "Obserwuj¹cy"
-int __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -866,7 +798,7 @@ int __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do "Usun poprzedne tweetniecie"
-int __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -889,7 +821,7 @@ int __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do "Zapisane wyszukiwania"
-int __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam)
 {
   //Struktura kontaktu
   TPluginContact PluginContact;
@@ -1033,7 +965,7 @@ void BuildCommandItems()
 //---------------------------------------------------------------------------
 
 //Hook na aktwyna zakladke lub okno rozmowy (pokazywanie menu do cytowania, tworzenie buttonow)
-int __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
 {
   //Pobranie uchwytu do okna rozmowy
   if(!hFrmSend) hFrmSend = (HWND)wParam;
@@ -1065,7 +997,7 @@ int __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na pokazywane wiadomosci (formatowanie tweetow)
-int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 {
   //Pobieranie danych kontatku
   TPluginContact AddLineContact = *(PPluginContact)wParam;
@@ -1084,12 +1016,83 @@ int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	UnicodeString Body = (wchar_t*)AddLineMessage.Body;
 	Body = Body.Trim();
 	//Zabezpieczenie przed bledem bota - dublowanie wiadomosci
-	if(Body!=LastAddLineBody->ReadString("Body",ContactJID,""))
+	if((ContactJID!=MessageJID)||((ContactJID==MessageJID)&&(Body!=LastAddLineBody->ReadString("Body",ContactJID,""))&&(Body!=LastAddLineBody->ReadString("Body2",ContactJID,""))))
 	{
-	  //Zapamietanie wiadomosci
-	  LastAddLineBody->WriteString("Body",ContactJID,Body);
-	  //Non-breaking space
-  	  if(Body.Pos("&#12288;")) Body = StringReplace(Body, "&#12288;", " ", TReplaceFlags() << rfReplaceAll);
+	  //Zabezpieczenie przed bledem bota - dublowanie wiadomosci
+	  if(ContactJID==MessageJID)
+	  {
+		//Wyjatki
+		if((Body!="Update request has been sent")
+		&&(Body!="The message has been sent.")
+		&&(Body!="You have no saved searches")
+		&&(!((Body.Pos("User ")==1)&&(Body.Pos(" now follows you"))))
+		&&(!((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore"))))
+		&&(Body.Pos("Saved searches:")!=1)
+		&&(!((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))))
+		{
+		  //Zmiana miejsca poprzedniej zapamietanej wiadomosci
+		  LastAddLineBody->WriteString("Body2",ContactJID,LastAddLineBody->ReadString("Body",ContactJID,""));
+		  //Zapamietanie wiadomosci
+		  LastAddLineBody->WriteString("Body",ContactJID,Body);
+		}
+		//Tlumaczenie wiadomosci
+		else
+		{
+		  //Tlumaczenie
+		  if(Body=="Update request has been sent")
+		   Body = "¯¹danie aktualizacji zosta³o wys³ane.";
+		  else if(Body=="The message has been sent.")
+		   Body = "Wiadomoœæ zosta³a wys³ana.";
+		  else if(Body!="You have no saved searches")
+		   Body = "Nie masz zapisanych wyszukiwañ.";
+		  else if((Body.Pos("User ")==1)&&(Body.Pos(" now follows you")))
+		  {
+			//Znaki HTMLowe
+			if(Body.Pos("&quot;")) Body = StringReplace(Body, "&quot;", "\"", TReplaceFlags() << rfReplaceAll);
+			//Wyciagnie loginu uzytkownika
+			UnicodeString UserLogin = Body;
+			UserLogin.Delete(1,UserLogin.Pos("\""));
+			UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
+			//Tworzenie odnosnika
+			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
+			//Spolszczanie pozostalych fraz
+			Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
+			Body = StringReplace(Body,"now follows you", "doda³ Ciê do obserowanych.", TReplaceFlags());
+		  }
+		  else if((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore")))
+		  {
+			//Znaki HTMLowe
+			if(Body.Pos("&quot;")) Body = StringReplace(Body, "&quot;", "\"", TReplaceFlags() << rfReplaceAll);
+			//Wyciagnie loginu uzytkownika
+			UnicodeString UserLogin = Body;
+			UserLogin.Delete(1,UserLogin.Pos("\""));
+			UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
+			//Tworzenie odnosnika
+			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
+			//Spolszczanie pozostalych fraz
+			Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
+			Body = StringReplace(Body,"doesn't follow you anymore", "przesta³ Ciê obserwowaæ.", TReplaceFlags());
+		  }
+		  else if(Body.Pos("Saved searches:")==1)
+		  {
+			Body = StringReplace(Body,"Saved searches:", "Zapisane wyszukiwania:", TReplaceFlags());
+			goto Transalte_Jump;
+		  }
+		  else if((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))
+		   Body = "Twoja ostatnia wiadomoœæ zosta³a usuniêta.";
+		  //Zwrocenie zmodyfikowanej wiadomosci;
+		  AddLineMessage.Body = Body.w_str();
+		  memcpy((PPluginMessage)lParam,&AddLineMessage, sizeof(TPluginMessage));
+		  return 2;
+		}
+	  }
+	  //Translate jump
+	  Transalte_Jump: { /* Nic tu nie ma trolololo :D */ }
+
+	  //Znaki HTMLowe
+	  if(Body.Pos("&amp;")) Body = StringReplace(Body, "&amp;", "&", TReplaceFlags() << rfReplaceAll);
+	  if(Body.Pos("&#12288;")) Body = StringReplace(Body, "&#12288;", " ", TReplaceFlags() << rfReplaceAll);
+
 	  //Formatowanie tagow
 	  while(Body.Pos("#"))
 	  {
@@ -1379,7 +1382,7 @@ int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 			    {
 				  Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
 				  Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-			  }  
+			  }
 			  }
 			  //Wyrozanie dowolnych fraz
 			  else if(Body.LowerCase().Pos(Item.LowerCase()))
@@ -1406,7 +1409,7 @@ int __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na zmiane kolorystyki AlphaControls
-int __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
 {
   //Okno ustawien zostalo juz stworzone
   if(hTweetForm)
@@ -1424,7 +1427,7 @@ int __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na zaladowanie wszystkich modulow w AQQ (autoupdate awatarow)
-int __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 {
   //Automatyczna aktualizacja awatarow
   AutoAvatarsUpdate();
@@ -1434,7 +1437,7 @@ int __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na pobieranie adresow URL z roznych popup (tworzenie itemow w popup menu do akcji z tweetami)
-int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 {
   //Domyslne usuwanie elementow
   TPluginAction InsertTagItem;
@@ -1606,7 +1609,7 @@ int __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 }
 //---------------------------------------------------------------------------
 
-int __stdcall OnPrimaryTab (WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnPrimaryTab (WPARAM wParam, LPARAM lParam)
 {
   //Pobranie uchwytu do okna rozmowy
   if(!hFrmSend) hFrmSend = (HWND)wParam;
@@ -1638,7 +1641,7 @@ int __stdcall OnPrimaryTab (WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na odbieranie wiadomosci
-int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
 {
   //Pobieranie danych kontatku
   TPluginContact RecvMsgContact = *(PPluginContact)wParam;
@@ -1652,9 +1655,23 @@ int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
 	//Pobranie tresci wiadomosci
 	UnicodeString Body = (wchar_t*)RecvMsgMessage.Body;
 	//Zabezpieczenie przed bledem bota - dublowanie wiadomosci
-	if(Body!=LastRecvMsgBody->ReadString("Body",ContactJID,""))
-	 //Zapamietanie wiadomosci
-	 LastRecvMsgBody->WriteString("Body",ContactJID,Body);
+	if((Body!=LastRecvMsgBody->ReadString("Body",ContactJID,""))&&(Body!=LastRecvMsgBody->ReadString("Body2",ContactJID,"")))
+	{
+	  //Wyjatki
+	  if((Body!="Update request has been sent")
+	  &&(Body!="The message has been sent.")
+	  &&(Body!="You have no saved searches")
+	  &&(!((Body.Pos("User ")==1)&&(Body.Pos(" now follows you"))))
+	  &&(!((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore"))))
+	  &&(Body.Pos("Saved searches:")!=1)
+	  &&(!((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))))
+	  {
+		//Zmiana miejsca poprzedniej zapamietanej wiadomosci
+		LastRecvMsgBody->WriteString("Body2",ContactJID,LastRecvMsgBody->ReadString("Body",ContactJID,""));
+		//Zapamietanie wiadomosci
+		LastRecvMsgBody->WriteString("Body",ContactJID,Body);
+	  }
+	}
 	//Blokada wiadomosci
 	else return 1;
   }
@@ -1664,7 +1681,7 @@ int __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Hook na zmiane kompozycji (pobranie stylu zalacznikow oraz zmiana skorkowania wtyczki)
-int __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 {
   //Okno ustawien zostalo juz stworzone
   if(hTweetForm)
@@ -1766,7 +1783,7 @@ void LoadSettings()
   TIniFile *Ini = new TIniFile(GetPluginUserDir()+"\\\\tweetIM\\\\Settings.ini");
   //Awatary
   AvatarSize = Ini->ReadInteger("Avatars","Size",25);
-  StaticAvatarStyle = UTF8ToUnicodeString(IniStrToStr(Ini->ReadString("Avatars","Style","").Trim().w_str()));
+  StaticAvatarStyle = DecodeBase64(Ini->ReadString("Avatars64","Style","").Trim().w_str());
   if(StaticAvatarStyle=="<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
    StaticAvatarStyle = "";
   //Wyroznianie
@@ -1798,7 +1815,7 @@ void LoadSettings()
 }
 //---------------------------------------------------------------------------
 
-extern "C" int __declspec(dllexport) __stdcall Load(PPluginLink Link)
+extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 {
   //Linkowanie wtyczki z komunikatorem
   PluginLink = *Link;
@@ -1896,7 +1913,7 @@ extern "C" int __declspec(dllexport) __stdcall Load(PPluginLink Link)
 }
 //---------------------------------------------------------------------------
 
-extern "C" int __declspec(dllexport) __stdcall Unload()
+extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 {
   //Anty "Abnormal program termination"
   hTweetForm->aForceDisconnect->Execute();
@@ -2012,16 +2029,10 @@ extern "C" int __declspec(dllexport) __stdcall Unload()
 //---------------------------------------------------------------------------
 
 //Ustawienia wtyczki
-extern "C" int __declspec(dllexport)__stdcall Settings()
+extern "C" INT_PTR __declspec(dllexport)__stdcall Settings()
 {
-  //Przypisanie uchwytu do formy ustawien
-  if(!hTweetForm)
-  {
-	Application->Handle = (HWND)TweetForm;
-	hTweetForm = new TTweetForm(Application);
-  }
-  //Pokaznie okna ustawien
-  hTweetForm->Show();
+  //Otwarcie okna ustawien
+  OpenSettingsForm();
 
   return 0;
 }
@@ -2032,11 +2043,11 @@ extern "C" __declspec(dllexport) PPluginInfo __stdcall AQQPluginInfo(DWORD AQQVe
 {
   PluginInfo.cbSize = sizeof(TPluginInfo);
   PluginInfo.ShortName = L"tweet.IM";
-  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,0,2,0);
+  PluginInfo.Version = PLUGIN_MAKE_VERSION(1,1,0,0);
   PluginInfo.Description = L"Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.";
-  PluginInfo.Author = L"Krzysztof Grochocki (Beherit)";
+  PluginInfo.Author = L"Krzysztof Grochocki";
   PluginInfo.AuthorMail = L"kontakt@beherit.pl";
-  PluginInfo.Copyright = L"Krzysztof Grochocki (Beherit)";
+  PluginInfo.Copyright = L"Krzysztof Grochocki";
   PluginInfo.Homepage = L"http://beherit.pl";
 
   return &PluginInfo;

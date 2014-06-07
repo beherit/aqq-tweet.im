@@ -1,3 +1,16 @@
+1.1.0.0
+-----
+* Tłumaczenie niektórych wiadomości bota.
+* Wersja 64-bitowa jest wreszcie prawidłowo skórkowana.
+* Kompilacja pod poprawionymi nagłówkami dla wersji 64-bitowej.
+* Zmniejszenie rozmiaru wtyczki 64-bitowej poprzez użycie kompresji LZMA.
+* Rozszerzenie funkcji ignorowania plików awatarów podczas aktualizacji (np. usuwanie konfliktów stworzonych przez Dropbox podczas trzymania profilu w chmurze).
+* Poprawiono ignorowanie zdublowanych wiadomości od bota.
+* Zmiany w zapisywaniu stylu awatarów do pliku INI.
+* Optymalizacja pokazywania postępu aktualizacji awatarów na taskbarze.
+* Usunięcie zbędnego kodu (pozostałości po wtyczce Blip).
+* Aktualizacja komponentów AlphaControls do nowszej wersji (9.03).
+
 1.0.2.0
 -----
 * Kolejna poprawka na niewyświetlanie zdublowanych wiadomości od bota.

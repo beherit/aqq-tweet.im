@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013 Krzysztof Grochocki
+// Copyright (C) 2013-2014 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -24,7 +24,9 @@
 #define TweetFrmH
 #define WM_ALPHAWINDOWS (WM_USER + 666)
 //---------------------------------------------------------------------------
+#include "acProgressBar.hpp"
 #include "sBevel.hpp"
+#include "sButton.hpp"
 #include "sCheckBox.hpp"
 #include "sColorSelect.hpp"
 #include "sComboBox.hpp"
@@ -51,6 +53,7 @@
 #include <IdThreadComponent.hpp>
 #include <System.Actions.hpp>
 #include <System.Classes.hpp>
+#include <System.Win.TaskbarCore.hpp>
 #include <Vcl.ActnList.hpp>
 #include <Vcl.Buttons.hpp>
 #include <Vcl.ComCtrls.hpp>
@@ -58,10 +61,7 @@
 #include <Vcl.ExtCtrls.hpp>
 #include <Vcl.FileCtrl.hpp>
 #include <Vcl.StdCtrls.hpp>
-#include "sButton.hpp"
-#include "acProgressBar.hpp"
-#include "acImage.hpp"
-#include "acPNG.hpp"
+#include <Vcl.Taskbar.hpp>
 //---------------------------------------------------------------------------
 class TTweetForm : public TForm
 {
@@ -122,6 +122,7 @@ __published:	// IDE-managed Components
 	TTimer *AvatarsIdHTTPTimer;
 	TIdSSLIOHandlerSocketOpenSSL *IdSSLIOHandlerSocketOpenSSL;
 	TIdThreadComponent *GetAvatarsThread;
+	TTaskbar *Taskbar;
 	void __fastcall SaveButtonClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall aLoadSettingsExecute(TObject *Sender);

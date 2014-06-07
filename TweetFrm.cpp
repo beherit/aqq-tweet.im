@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013 Krzysztof Grochocki
+// Copyright (C) 2013-2014 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -26,7 +26,9 @@
 #include <inifiles.hpp>
 #include <utilcls.h>
 #pragma package(smart_init)
+#pragma link "acProgressBar"
 #pragma link "sBevel"
+#pragma link "sButton"
 #pragma link "sCheckBox"
 #pragma link "sColorSelect"
 #pragma link "sComboBox"
@@ -40,13 +42,9 @@
 #pragma link "sSkinProvider"
 #pragma link "sSpeedButton"
 #pragma link "sSpinEdit"
-#pragma link "sButton"
-#pragma link "acProgressBar"
 #pragma resource "*.dfm"
 TTweetForm *TweetForm;
 //---------------------------------------------------------------------------
-typedef TComInterface<ITaskbarList3, &IID_ITaskbarList3> ITaskbarListPtr;
-ITaskbarListPtr FTaskbarList;
 __declspec(dllimport)UnicodeString GetPluginUserDir();
 __declspec(dllimport)UnicodeString GetPluginUserDirW();
 __declspec(dllimport)UnicodeString GetThemeSkinDir();
@@ -63,7 +61,7 @@ __declspec(dllimport)void SetAvatarStyle(UnicodeString Style);
 __declspec(dllimport)bool ChkAvatarsListItem();
 __declspec(dllimport)UnicodeString GetAvatarsListItem();
 __declspec(dllimport)void LoadSettings();
-__declspec(dllimport)UnicodeString StrToIniStr(UnicodeString Str);
+__declspec(dllimport)UnicodeString EncodeBase64(UnicodeString Str);
 //---------------------------------------------------------------------------
 bool AnimateMode;
 bool ForceDisconnect = false;
@@ -191,10 +189,6 @@ bool __fastcall TTweetForm::AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeStr
 
 void __fastcall TTweetForm::FormCreate(TObject *Sender)
 {
-  //Hack na blad w AC
-  #if defined(_WIN64)
-  HighlightMsgListView->SkinData->SkinSection = "";
-  #endif
   //Wlaczona zaawansowana stylizacja okien
   if(ChkSkinEnabled())
   {
@@ -418,8 +412,7 @@ void __fastcall TTweetForm::AvatarStyleSaveButtonClick(TObject *Sender)
 {
   //Zapisanie stylu awatarow do pliku
   TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
-  ShortString pStyle = UTF8EncodeToShortString(AvatarsStyleMemo->Text);
-  Ini->WriteString("Avatars", "Style", StrToIniStr(pStyle.operator AnsiString()));
+  Ini->WriteString("Avatars64", "Style", EncodeBase64(AvatarsStyleMemo->Text));
   delete Ini;
   //Ustawienie stylu w rdzeniu wtyczki
   SetAvatarStyle(AvatarsStyleMemo->Text);
@@ -485,24 +478,31 @@ void __fastcall TTweetForm::ManualAvatarsUpdateButtonClick(TObject *Sender)
 	ProgressLabel->Caption = "Pobieranie danych...";
 	ProgressLabel->Visible = true;
 	//Wlaczenie paska postepu na taskbarze
-	if((!FTaskbarList)&&(SUCCEEDED(FTaskbarList.CreateInstance(CLSID_TaskbarList, 0))))
-	 FTaskbarList->HrInit();
+	Taskbar->ProgressValue = 0;
+	Taskbar->ProgressState = TTaskBarProgressState::Normal;
 	//Pobieranie listy plikow
 	FileListBox->Directory = "";
 	FileListBox->Directory = GetPluginUserDirW() + "\\tweetIM\\Avatars";
-	//Ignoowanie plikow *.tmp
+	//Ignorowanie plikow *.tmp i plikow ze spacja (np. konflikty stworzone przez Dropbox'a)
 	for(int Count=0;Count<FileListBox->Items->Count;Count++)
 	{
 	  if(ExtractFileName(FileListBox->Items->Strings[Count]).Pos(".tmp")>0)
 	  {
 		DeleteFile(FileListBox->Items->Strings[Count]);
-		FileListBox->Items->Strings[Count] ="TMP_DELETE";
+		FileListBox->Items->Strings[Count] = "TMP_DELETE";
+	  }
+	  else if(ExtractFileName(FileListBox->Items->Strings[Count]).Pos(" ")>0)
+	  {
+		DeleteFile(FileListBox->Items->Strings[Count]);
+		FileListBox->Items->Strings[Count] = "TMP_DELETE";
 	  }
 	}
 	while(FileListBox->Items->IndexOf("TMP_DELETE")!=-1)
 	 FileListBox->Items->Delete(FileListBox->Items->IndexOf("TMP_DELETE"));
 	//Ustawianie maksymalnego paska postepu
 	ProgressBar->Max = FileListBox->Items->Count;
+	//Ustawianie maksymalnego paska postepu na taskbarze
+	Taskbar->ProgressMaxValue = FileListBox->Items->Count;
 	//Wlacznie aktualizacji
 	ManualAvatarsUpdateThread->Start();
   }
@@ -730,7 +730,7 @@ void __fastcall TTweetForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sen
 	 delete MemFile;
 	//Kolejny plik
 	ProgressBar->Position++;
-	if(FTaskbarList) FTaskbarList->SetProgressValue(Handle, ProgressBar->Position, ProgressBar->Max);
+	Taskbar->ProgressValue++;
 	//Wymuszenie wylaczenia
 	if(ForceDisconnect) Count = FileListBox->Items->Count;
   }
@@ -747,7 +747,7 @@ void __fastcall TTweetForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sen
   ProgressBar->Visible = false;
   ProgressLabel->Visible = false;
   //Wylaczenie paska postepuna taskbarze
-  if(FTaskbarList) FTaskbarList->SetProgressState(Handle, TBPF_NOPROGRESS);
+  Taskbar->ProgressState = TTaskBarProgressState::None;
   //Default caption
   ManualAvatarsUpdateButton->Caption ="Sprawdü aktualizacje";
   if(ForceDisconnect)
@@ -801,10 +801,7 @@ void __fastcall TTweetForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sende
 	 delete MemFile;
 	//Kolejny plik
 	ProgressBar->Position++;
-	//Wlaczenie paska postepu na taskbarze
-	if((!FTaskbarList)&&(SUCCEEDED(FTaskbarList.CreateInstance(CLSID_TaskbarList, 0))))
-	 FTaskbarList->HrInit();
-	if(FTaskbarList) FTaskbarList->SetProgressValue(Handle, ProgressBar->Position, ProgressBar->Max);
+	Taskbar->ProgressValue++;
 	//Wymuszenie wylaczenia
 	if(ForceDisconnect) Count = FileListBox->Items->Count;
   }
@@ -821,7 +818,7 @@ void __fastcall TTweetForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sende
   ProgressBar->Visible = false;
   ProgressLabel->Visible = false;
   //Wylaczenie paska postepuna taskbarze
-  if(FTaskbarList) FTaskbarList->SetProgressState(Handle, TBPF_NOPROGRESS);
+  Taskbar->ProgressState = TTaskBarProgressState::None;
   //Default caption
   ManualAvatarsUpdateButton->Caption ="Sprawdü aktualizacje";
   if(ForceDisconnect)
