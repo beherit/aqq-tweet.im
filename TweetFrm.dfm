@@ -405,6 +405,7 @@ object TweetForm: TTweetForm
           BoundLabel.MaxWidth = 0
           BoundLabel.UseSkinColor = True
           SkinData.SkinSection = 'COMBOBOX'
+          VerticalAlignment = taAlignTop
           Style = csDropDownList
           Font.Charset = EASTEUROPE_CHARSET
           Font.Color = clWindowText
@@ -847,6 +848,7 @@ object TweetForm: TTweetForm
         BoundLabel.MaxWidth = 0
         BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
+        VerticalAlignment = taAlignTop
         Style = csOwnerDrawFixed
         ItemIndex = 0
         TabOrder = 4
@@ -955,6 +957,7 @@ object TweetForm: TTweetForm
     MenuSupport.ExtraLineFont.Height = -11
     MenuSupport.ExtraLineFont.Name = 'Tahoma'
     MenuSupport.ExtraLineFont.Style = []
+    Options.OptimizingPriority = opMemory
     SkinDirectory = 'c:\Skins'
     SkinInfo = 'N/A'
     ThirdParty.ThirdEdits = ' '
@@ -978,6 +981,7 @@ object TweetForm: TTweetForm
     ThirdParty.ThirdScrollControl = ' '
     ThirdParty.ThirdUpDown = ' '
     ThirdParty.ThirdScrollBar = ' '
+    ThirdParty.ThirdStaticText = ' '
     Left = 160
     Top = 264
   end
@@ -1050,5 +1054,11 @@ object TweetForm: TTweetForm
     OnRun = GetAvatarsThreadRun
     Left = 96
     Top = 296
+  end
+  object Taskbar: TTaskbar
+    TaskBarButtons = <>
+    TabProperties = []
+    Left = 194
+    Top = 270
   end
 end

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013 Krzysztof Grochocki
+// Copyright (C) 2013-2014 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -21,4 +21,3 @@
 
 #include <vcl.h>
 #include <tchar.h>
-
