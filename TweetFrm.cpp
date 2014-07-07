@@ -949,3 +949,10 @@ void __fastcall TTweetForm::ColorHighlightMsgEditChange(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TTweetForm::sSkinManagerSysDlgInit(TacSysDlgData DlgData, bool &AllowSkinning)
+{
+  AllowSkinning = false;
+}
+//---------------------------------------------------------------------------
+
