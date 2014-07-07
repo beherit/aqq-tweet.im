@@ -214,10 +214,6 @@ object TweetForm: TTweetForm
       Caption = 'Awatary'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AvatarsSizeGroupBox: TsGroupBox
         Left = 7
         Top = 3
@@ -982,6 +978,8 @@ object TweetForm: TTweetForm
     ThirdParty.ThirdUpDown = ' '
     ThirdParty.ThirdScrollBar = ' '
     ThirdParty.ThirdStaticText = ' '
+    ThirdParty.ThirdNativePaint = ' '
+    OnSysDlgInit = sSkinManagerSysDlgInit
     Left = 160
     Top = 264
   end
