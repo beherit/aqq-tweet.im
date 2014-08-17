@@ -59,6 +59,8 @@ UnicodeString ItemCopyData;
 HWND hFrmSend;
 //Uchwyt do pola RichEdit
 HWND hRichEdit;
+//Uchwyt do okna timera
+HWND hTimerFrm;
 //Ostatnio wyswietlona wiadomosci od bota
 TCustomIniFile* LastAddLineBody = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
 TCustomIniFile* LastRecvMsgBody = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
@@ -69,6 +71,9 @@ bool HighlightMsgChk;
 int HighlightMsgModeChk;
 TStringList *HighlightMsgItemsList = new TStringList;
 TCustomIniFile* HighlightMsgColorsList = new TMemIniFile(ChangeFileExt(Application->ExeName, ".INI"));
+//TIMERY---------------------------------------------------------------------
+#define TIMER_UPDATE_AVATARS_ONLOAD 10
+#define TIMER_UPDATE_AVATARS 20
 //FORWARD-AQQ-HOOKS----------------------------------------------------------
 INT_PTR __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam);
@@ -90,6 +95,8 @@ INT_PTR __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam);
+//FORWARD-TIMER--------------------------------------------------------------
+LRESULT CALLBACK TimerFrmProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //---------------------------------------------------------------------------
 
 //Otwarcie okna ustawien
@@ -964,6 +971,35 @@ void BuildCommandItems()
 }
 //---------------------------------------------------------------------------
 
+//Procka okna timera
+LRESULT CALLBACK TimerFrmProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+  if(uMsg==WM_TIMER)
+  {
+	//Aktualizacja awatarow po wlaczeniu wtyczki
+	if(wParam==TIMER_UPDATE_AVATARS_ONLOAD)
+	{
+	  //Zatrzymanie timera
+	  KillTimer(hTimerFrm,TIMER_UPDATE_AVATARS_ONLOAD);
+	  //Wlaczenie timera regularnej aktualizacji
+      SetTimer(hTimerFrm,TIMER_UPDATE_AVATARS,3600000,(TIMERPROC)TimerFrmProc);
+	  //Sprawdzenie aktualizacji awatarow
+	  AutoAvatarsUpdate();
+	}
+	//Regularna aktualizacja awatarow
+	else if(wParam==TIMER_UPDATE_AVATARS)
+	{
+	  //Sprawdzenie aktualizacji awatarow
+	  AutoAvatarsUpdate();
+	}
+
+	return 0;
+  }
+
+  return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+//---------------------------------------------------------------------------
+
 //Hook na aktwyna zakladke lub okno rozmowy (pokazywanie menu do cytowania, tworzenie buttonow)
 INT_PTR __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam)
 {
@@ -1429,8 +1465,8 @@ INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
 //Hook na zaladowanie wszystkich modulow w AQQ (autoupdate awatarow)
 INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 {
-  //Automatyczna aktualizacja awatarow
-  AutoAvatarsUpdate();
+  //Timer aktualizacji awatarow po wlaczeniu wtyczki
+  SetTimer(hTimerFrm,TIMER_UPDATE_AVATARS_ONLOAD,300000,(TIMERPROC)TimerFrmProc);
 
   return 0;
 }
@@ -1898,11 +1934,28 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
   LoadSettings();
   //Pobranie stylu Avatars
   GetThemeStyle();
+  //Rejestowanie klasy okna timera
+  WNDCLASSEX wincl;
+  wincl.cbSize = sizeof (WNDCLASSEX);
+  wincl.style = 0;
+  wincl.lpfnWndProc = TimerFrmProc;
+  wincl.cbClsExtra = 0;
+  wincl.cbWndExtra = 0;
+  wincl.hInstance = HInstance;
+  wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+  wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wincl.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+  wincl.lpszMenuName = NULL;
+  wincl.lpszClassName = L"TTweetIMTimer";
+  wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+  RegisterClassEx(&wincl);
+  //Tworzenie okna timera
+  hTimerFrm = CreateWindowEx(0, L"TTweetIMTimer", L"",	0, 0, 0, 0, 0, NULL, NULL, HInstance, NULL);
   //Jezeli wszystkie moduly w AQQ zostaly juz zaladowany przed wczytaniem wtyczki
   if(PluginLink.CallService(AQQ_SYSTEM_MODULESLOADED,0,0))
   {
-	//Wlaczenie autoupdate awatarow
-	AutoAvatarsUpdate();
+	//Timer aktualizacji awatarow po wlaczeniu wtyczki
+	SetTimer(hTimerFrm,TIMER_UPDATE_AVATARS_ONLOAD,300000,(TIMERPROC)TimerFrmProc);
 	//Hook na pobieranie aktywnych zakladek
 	PluginLink.HookEvent(AQQ_CONTACTS_BUDDY_PRIMARYTAB,OnPrimaryTab);
 	PluginLink.CallService(AQQ_CONTACTS_BUDDY_FETCHALLTABS,0,0);
@@ -1917,6 +1970,12 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 {
   //Anty "Abnormal program termination"
   hTweetForm->aForceDisconnect->Execute();
+  //Zatrzymanie timerow
+  for(int TimerID=10;TimerID<=20;TimerID=TimerID+10) KillTimer(hTimerFrm,TimerID);
+  //Usuwanie okna timera
+  DestroyWindow(hTimerFrm);
+  //Wyrejestowanie klasy okna timera
+  UnregisterClass(L"TTweetIMTimer",HInstance);
   //Wyladowanie hookow
   PluginLink.UnhookEvent(OnActiveTab);
   PluginLink.UnhookEvent(OnAddLine);
