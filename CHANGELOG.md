@@ -1,3 +1,10 @@
+1.1.3.0
+-----
+* Drobne poprawki pod kątem AQQ 3.0.
+* Sprawdzanie aktualizacji awatarów nie działa już tylko przy włączaniu wtyczki.
+* Pełne wsparcie kolorystyki stylizacji okien.
+* Aktualizacja komponentów AlphaControls do nowszej wersji (9.12).
+
 1.1.2.0
 -----
 * Nieskórkowanie systemowych okien dialogowych niepochodzących z wtyczki.
