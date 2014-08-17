@@ -1054,7 +1054,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 			UserLogin.Delete(1,UserLogin.Pos("\""));
 			UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
 			//Tworzenie odnosnika
-			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
+			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
 			//Spolszczanie pozostalych fraz
 			Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
 			Body = StringReplace(Body,"now follows you", "doda³ Ciê do obserowanych.", TReplaceFlags());
@@ -1068,7 +1068,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 			UserLogin.Delete(1,UserLogin.Pos("\""));
 			UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
 			//Tworzenie odnosnika
-			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
+			Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
 			//Spolszczanie pozostalych fraz
 			Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
 			Body = StringReplace(Body,"doesn't follow you anymore", "przesta³ Ciê obserwowaæ.", TReplaceFlags());
@@ -1107,8 +1107,8 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    TempStr2.Delete(2,TempStr2.Length());
 	    //Jezeli fraza jest tagiem
 	    if((AllowedTagsCharacters(TempStr2))
-	     &&(TempStr.LowerCase().Pos("href=\"link:")==0)
-	     &&(TempStr.LowerCase().Pos("title=\"http://")==0)
+	     &&(TempStr.LowerCase().Pos("href=\"")==0)
+		 &&(TempStr.LowerCase().Pos("title=\"http://")==0)
 	     &&(TempStr.LowerCase().Pos("title=\"https://")==0)
 	     &&(TempStr.LowerCase().Pos("title=\"www")==0))
 	    {
@@ -1146,7 +1146,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    }
 	    else Body = StringReplace(Body, "#", "[CC_TAGS]", TReplaceFlags());
 	  }
-	  Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"link:https://twitter.com/search?q=%23", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"http://aqq-link/?url=https://twitter.com/search?q=%23", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_TAGS_LINK2]", "&src=hash\">", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_TAGS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_TAGS]", "#", TReplaceFlags() << rfReplaceAll);
@@ -1165,8 +1165,8 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    TempStr2.Delete(2,TempStr2.Length());
 	    //Jezeli fraza jest uzytkownikiem
 	    if((AllowedUsersCharacters(TempStr2))
-	     &&(TempStr.LowerCase().Pos("href=\"link:")==0)
-	     &&(TempStr.LowerCase().Pos("title=\"http://")==0)
+	     &&(TempStr.LowerCase().Pos("href=\"")==0)
+		 &&(TempStr.LowerCase().Pos("title=\"http://")==0)
 	     &&(TempStr.LowerCase().Pos("title=\"https://")==0)
 	     &&(TempStr.LowerCase().Pos("title=\"www")==0))
 	    {
@@ -1182,7 +1182,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    }
 	    else Body = StringReplace(Body, "@", "[CC_USERS]", TReplaceFlags());
 	  }
-	  Body = StringReplace(Body, "[CC_USERS_LINK]", "<A HREF=\"link:https://twitter.com/", TReplaceFlags() << rfReplaceAll);
+	  Body = StringReplace(Body, "[CC_USERS_LINK]", "<A HREF=\"http://aqq-link/?url=https://twitter.com/", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_USERS_LINK2]", "\">", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_USERS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
 	  Body = StringReplace(Body, "[CC_USERS]", "@", TReplaceFlags() << rfReplaceAll);
@@ -1203,7 +1203,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    DisplayName.Delete(DisplayName.Pos("("),DisplayName.Length());
 	    DisplayName = DisplayName.Trim();
 	    //Tworzenie odnosnika
-	    Body = StringReplace(Body, TempStr + ":", "<B><A HREF=\"link:https://twitter.com/" + UserLogin + "\" title=\"@" + UserLogin + "\">" + DisplayName + "</A></B>:", TReplaceFlags());
+	    Body = StringReplace(Body, TempStr + ":", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\" title=\"@" + UserLogin + "\">" + DisplayName + "</A></B>:", TReplaceFlags());
 	  }
 
 	  //Dodawanie awatarow
@@ -1218,14 +1218,14 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    if(!FileExists(AvatarsDir + "\\\\" + TweetSender))
 	    {
 		  //Wstawienie online'owego awatara
-		  Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://twitter.com/api/users/profile_image/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+		  Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://twitter.com/api/users/profile_image/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 		  //Dodanie awatara do pobrania
 		  GetAvatarsList->Add(TweetSender);
 		  //Wlaczenie watku
 		  if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
 	    }
 	    //Awatar znajduje sie w folderze cache
-	    else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"link:https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+		else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 	    //Dodanie awatar(a/ow) do tresci wiadomosci
 	    Body = Avatars + Body;
 	  }
@@ -1725,7 +1725,7 @@ INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 	  hTweetForm->LastAvatarsUpdateLabel->Kind->Color = clGreen;
 	}
   }
-  //Pobranie stylu Attachment & Avatars
+  //Pobranie stylu Avatars
   GetThemeStyle();
 
   return 0;
@@ -1896,7 +1896,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
   PluginLink.HookEvent(AQQ_SYSTEM_THEMECHANGED,OnThemeChanged);
   //Odczyt ustawien
   LoadSettings();
-  //Pobranie stylu Attachment & Avatars
+  //Pobranie stylu Avatars
   GetThemeStyle();
   //Jezeli wszystkie moduly w AQQ zostaly juz zaladowany przed wczytaniem wtyczki
   if(PluginLink.CallService(AQQ_SYSTEM_MODULESLOADED,0,0))
