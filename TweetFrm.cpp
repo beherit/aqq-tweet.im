@@ -705,7 +705,7 @@ void __fastcall TTweetForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sen
 	MemFile->Position = 0;
 	//Ustalanie adresu pobierania awataru
 	UnicodeString UpdateURL;
-	UpdateURL = "http://twitter.com/api/users/profile_image/" + ExtractFileName(FileListBox->FileName);
+	UpdateURL = "https://beherit.pl/tweetIM/?user=" + ExtractFileName(FileListBox->FileName);
 	//Pobieranie awatara
 	if(AUIdHTTPGetFileToMem(MemFile,UpdateURL))
 	{
@@ -776,7 +776,7 @@ void __fastcall TTweetForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sende
 	MemFile->Position = 0;
 	//Ustalanie adresu pobierania awataru
 	UnicodeString UpdateURL;
-	UpdateURL = "http://twitter.com/api/users/profile_image/" + ExtractFileName(FileListBox->FileName);
+	UpdateURL = "https://beherit.pl/tweetIM/?user=" + ExtractFileName(FileListBox->FileName);
 	//Pobieranie awatara
 	if(AUIdHTTPGetFileToMem(MemFile,UpdateURL))
 	{
@@ -915,7 +915,7 @@ void __fastcall TTweetForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
 	TMemoryStream* MemFile = new TMemoryStream;
 	MemFile->Position = 0;
 	//Pobieranie awatara
-	if(IdHTTPGetFileToMem(MemFile,"http://twitter.com/api/users/profile_image/" + TweetSender))
+	if(IdHTTPGetFileToMem(MemFile,"https://beherit.pl/tweetIM/?user=" + TweetSender))
 	{
 	  MemFile->Position = 0;
 	  if(MemFile->Size!=0)

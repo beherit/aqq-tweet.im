@@ -214,10 +214,6 @@ object TweetForm: TTweetForm
       Caption = 'Awatary'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AvatarsSizeGroupBox: TsGroupBox
         Left = 7
         Top = 3
@@ -543,10 +539,6 @@ object TweetForm: TTweetForm
       Caption = 'Wyr'#243#380'nianie'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object EraseHighlightMsgSpeedButton: TsSpeedButton
         Left = 17
         Top = 154
@@ -1041,8 +1033,8 @@ object TweetForm: TTweetForm
     MaxLineAction = maException
     Port = 0
     DefaultPort = 0
-    SSLOptions.Method = sslvSSLv3
-    SSLOptions.SSLVersions = [sslvSSLv3]
+    SSLOptions.Method = sslvSSLv23
+    SSLOptions.SSLVersions = [sslvSSLv3, sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2]
     SSLOptions.Mode = sslmUnassigned
     SSLOptions.VerifyMode = []
     SSLOptions.VerifyDepth = 0
