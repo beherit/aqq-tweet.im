@@ -1,3 +1,8 @@
+1.2.0.0
+-----
+* Pobieranie awatarów poprzez zewnętrzny skrypt PHP korzystający z REST API v1.1.
+* Aktualizacja komponentów AlphaControls do nowszej wersji (9.18).
+
 1.1.3.0
 -----
 * Drobne poprawki pod kątem AQQ 3.0.
