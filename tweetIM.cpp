@@ -1259,7 +1259,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	    if(!FileExists(AvatarsDir + "\\\\" + TweetSender))
 	    {
 		  //Wstawienie online'owego awatara
-		  Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://twitter.com/api/users/profile_image/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+		  Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://beherit.pl/tweetIM/?user=" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 		  //Dodanie awatara do pobrania
 		  GetAvatarsList->Add(TweetSender);
 		  //Wlaczenie watku
