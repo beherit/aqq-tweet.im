@@ -1301,7 +1301,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 						Body = "¯¹danie aktualizacji zosta³o wys³ane.";
 					else if(Body=="The message has been sent.")
 						Body = "Wiadomoœæ zosta³a wys³ana.";
-					else if(Body!="You have no saved searches")
+					else if(Body=="You have no saved searches")
 						Body = "Nie masz zapisanych wyszukiwañ.";
 					else if((Body.Pos("User ")==1)&&(Body.Pos(" now follows you")))
 					{
