@@ -1260,7 +1260,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					//Wstawienie online'owego awatara
 					Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://beherit.pl/tweetIM/?user=" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 					//Dodanie awatara do pobrania
-					GetAvatarsList->Add(TweetSender);
+					GetAvatarsList->Add(TweetSender+";"+"https://beherit.pl/tweetIM/?user="+TweetSender);
 					//Wlaczenie watku
 					if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
 				}
@@ -1817,21 +1817,10 @@ INT_PTR __stdcall OnXMLDebug(WPARAM wParam, LPARAM lParam)
 							//Awatara nie ma w folderze cache
 							if(!FileExists(AvatarsDir + "\\\\" + twitter_nick))
 							{
-								//Tworzenie nowego pliku w pamieci
-								TMemoryStream* MemFile = new TMemoryStream;
-								MemFile->Position = 0;
-								//Pobieranie awatara
-								if(hTweetForm->IdHTTPGetFileToMem(MemFile,avatar_url))
-								{
-									MemFile->Position = 0;
-									if(MemFile->Size!=0)
-									{
-										MemFile->SaveToFile(GetAvatarsDir() + "\\\\" + twitter_nick);
-										delete MemFile;
-									}
-									else delete MemFile;
-								}
-								else delete MemFile;
+								//Dodanie awatara do pobrania
+								GetAvatarsList->Add(twitter_nick+";"+avatar_url);
+								//Wlaczenie watku
+								if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
 							}
 						}
 					}

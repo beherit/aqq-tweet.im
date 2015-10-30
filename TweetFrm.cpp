@@ -879,20 +879,25 @@ void __fastcall TTweetForm::AvatarsIdHTTPTimerTimer(TObject *Sender)
 void __fastcall TTweetForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
 {
 	//Pobranie itemu z listy awatarow do pobrania
-	UnicodeString TweetSender = GetAvatarsListItem();
+	UnicodeString Data = GetAvatarsListItem();
 	//Jest jakis awatar do pobrania
-	if(!TweetSender.IsEmpty())
+	if(!Data.IsEmpty())
 	{
+		//Parsowanie danycg
+		UnicodeString Nick = Data;
+		Nick = Nick.Delete(Nick.Pos(";"),Nick.Length());
+		UnicodeString URL = Data;
+		URL = URL.Delete(1,URL.Pos(";"));
 		//Tworzenie nowego pliku w pamieci
 		TMemoryStream* MemFile = new TMemoryStream;
 		MemFile->Position = 0;
 		//Pobieranie awatara
-		if(IdHTTPGetFileToMem(MemFile,"https://beherit.pl/tweetIM/?user=" + TweetSender))
+		if(IdHTTPGetFileToMem(MemFile,URL))
 		{
 			MemFile->Position = 0;
 			if(MemFile->Size!=0)
 			{
-				MemFile->SaveToFile(GetAvatarsDir() + "\\\\" + TweetSender);
+				MemFile->SaveToFile(GetAvatarsDir() + "\\\\" + Nick);
 				delete MemFile;
 			}
 			else delete MemFile;
@@ -929,3 +934,4 @@ void __fastcall TTweetForm::sSkinManagerSysDlgInit(TacSysDlgData DlgData, bool &
 	AllowSkinning = false;
 }
 //---------------------------------------------------------------------------
+
