@@ -552,6 +552,16 @@ int UsersCutPosition(UnicodeString Text)
 }
 //---------------------------------------------------------------------------
 
+//Usuwanie elementu szybkiego dostepu do ustawien wtyczki
+void DestroytweetIMFastSettings()
+{
+  TPluginAction FastSettingsItem;
+  ZeroMemory(&FastSettingsItem,sizeof(TPluginAction));
+  FastSettingsItem.cbSize = sizeof(TPluginAction);
+  FastSettingsItem.pszName = L"tweetIMFastSettingsItemButton";
+  PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM,0,(LPARAM)(&FastSettingsItem));
+}
+//---------------------------------------------------------------------------
 //Tworzenie elementu szybkiego dostepu do ustawien wtyczki
 void BuildtweetIMFastSettings()
 {
@@ -566,6 +576,335 @@ void BuildtweetIMFastSettings()
 	FastSettingsItem.pszPopupName = L"popPlugins";
 	FastSettingsItem.PopupPosition = 0;
 	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&FastSettingsItem));
+}
+//---------------------------------------------------------------------------
+
+//Usuwanie menu dla elementow wtyczki
+void DestroyPopupMenu()
+{
+	TPluginAction CommandPopUp;
+	ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
+	CommandPopUp.cbSize = sizeof(TPluginAction);
+	CommandPopUp.pszName = L"tweetIMCommandPopUp";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENU,0,(LPARAM)(&CommandPopUp));
+}
+//---------------------------------------------------------------------------
+//Tworzenie menu dla elementow wtyczki
+void BuildPopupMenu()
+{
+	TPluginAction CommandPopUp;
+	ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
+	CommandPopUp.cbSize = sizeof(TPluginAction);
+	CommandPopUp.pszName = L"tweetIMCommandPopUp";
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENU,0,(LPARAM)(&CommandPopUp));
+}
+//---------------------------------------------------------------------------
+
+void DestroyInsertTagItem()
+{
+	TPluginAction InsertTagItem;
+	ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
+	InsertTagItem.cbSize = sizeof(TPluginAction);
+	InsertTagItem.pszName = L"tweetIMInsertTagItem";
+	InsertTagItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertTagItem));
+}
+//---------------------------------------------------------------------------
+void BuildInsertTagItem()
+{
+	TPluginAction InsertTagItem;
+	ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
+	InsertTagItem.cbSize = sizeof(TPluginAction);
+	InsertTagItem.pszName = L"tweetIMInsertTagItem";
+	InsertTagItem.pszCaption = ("Wstaw " + ItemCopyData).w_str();
+	InsertTagItem.Position = 0;
+	InsertTagItem.IconIndex = 11;
+	InsertTagItem.pszService = L"stweetIMInsertTagItem";
+	InsertTagItem.pszPopupName = L"popURL";
+	InsertTagItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&InsertTagItem));
+}
+//---------------------------------------------------------------------------
+
+void DestroyInsertNickItem()
+{
+	TPluginAction InsertNickItem;
+	ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
+	InsertNickItem.cbSize = sizeof(TPluginAction);
+	InsertNickItem.pszName = L"tweetIMInsertNickItem";
+	InsertNickItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertNickItem));
+}
+//---------------------------------------------------------------------------
+void BuildInsertNickItem()
+{
+	TPluginAction InsertNickItem;
+	ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
+	InsertNickItem.cbSize = sizeof(TPluginAction);
+	InsertNickItem.pszName = L"tweetIMInsertNickItem";
+	InsertNickItem.pszCaption = ("Wstaw @" + ItemCopyData).w_str();
+	InsertNickItem.Position = 0;
+	InsertNickItem.IconIndex = 11;
+	InsertNickItem.pszService = L"stweetIMInsertNickItem";
+	InsertNickItem.pszPopupName = L"popURL";
+	InsertNickItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&InsertNickItem));
+}
+//---------------------------------------------------------------------------
+
+void DestroySendPrivMsgItem()
+{
+	TPluginAction SendPrivMsgItem;
+	ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
+	SendPrivMsgItem.cbSize = sizeof(TPluginAction);
+	SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
+	SendPrivMsgItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SendPrivMsgItem));
+}
+//---------------------------------------------------------------------------
+void BuildSendPrivMsgItem()
+{
+	TPluginAction SendPrivMsgItem;
+	ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
+	SendPrivMsgItem.cbSize = sizeof(TPluginAction);
+	SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
+	SendPrivMsgItem.pszCaption = L"Wiadomoœæ prywatna";
+	SendPrivMsgItem.Position = 0;
+	SendPrivMsgItem.IconIndex = 8;
+	SendPrivMsgItem.pszService = L"stweetIMSendPrivMsgItem";
+	SendPrivMsgItem.pszPopupName = L"popURL";
+	SendPrivMsgItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SendPrivMsgItem));
+}
+//---------------------------------------------------------------------------
+
+void DestroyLikeLastTweetItem()
+{
+	TPluginAction LikeLastTweetItem;
+	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
+	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
+	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
+	LikeLastTweetItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
+}
+//---------------------------------------------------------------------------
+void BuildLikeLastTweetItem()
+{
+	TPluginAction LikeLastTweetItem;
+	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
+	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
+	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
+	LikeLastTweetItem.pszCaption = L"Polub ostatnie tweetniêcie";
+	LikeLastTweetItem.Position = 0;
+	LikeLastTweetItem.IconIndex = 157;
+	LikeLastTweetItem.pszService = L"stweetIMLikeLastTweetItem";
+	LikeLastTweetItem.pszPopupName = L"popURL";
+	LikeLastTweetItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&LikeLastTweetItem));
+}
+//---------------------------------------------------------------------------
+
+//Usuwanie elementu do pokazywania najnowszych tweetniec uzytkownika
+void DestroyShowTimelineItem()
+{
+	TPluginAction ShowTimelineItem;
+	ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
+	ShowTimelineItem.cbSize = sizeof(TPluginAction);
+	ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
+	ShowTimelineItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowTimelineItem));
+}
+//---------------------------------------------------------------------------
+//Tworzenie elementu do pokazywania najnowszych tweetniec uzytkownika
+void BuildShowTimelineItem()
+{
+	TPluginAction ShowTimelineItem;
+	ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
+	ShowTimelineItem.cbSize = sizeof(TPluginAction);
+	ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
+	ShowTimelineItem.pszCaption = L"Poka¿ najnowsze tweetniêcia";
+	ShowTimelineItem.Position = 0;
+	ShowTimelineItem.IconIndex = 21;
+	ShowTimelineItem.pszService = L"stweetIMShowTimelineItem";
+	ShowTimelineItem.pszPopupName = L"popURL";
+	ShowTimelineItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowTimelineItem));
+}
+//---------------------------------------------------------------------------
+
+//Usuwanie elementu do pokazywania informacji o uzytkowniku
+void DestroyShowUserProfileItem()
+{
+	TPluginAction ShowUserProfileItem;
+	ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
+	ShowUserProfileItem.cbSize = sizeof(TPluginAction);
+	ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
+	ShowUserProfileItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowUserProfileItem));
+}
+//---------------------------------------------------------------------------
+//Tworzenie elementu do pokazywania informacji o uzytkowniku
+void BuildShowUserProfileItem()
+{
+	TPluginAction ShowUserProfileItem;
+	ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
+	ShowUserProfileItem.cbSize = sizeof(TPluginAction);
+	ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
+	ShowUserProfileItem.pszCaption = L"Poka¿ informacje o u¿ytkowniku";
+	ShowUserProfileItem.Position = 0;
+	ShowUserProfileItem.IconIndex = 21;
+	ShowUserProfileItem.pszService = L"stweetIMShowUserProfileItem";
+	ShowUserProfileItem.pszPopupName = L"popURL";
+	ShowUserProfileItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowUserProfileItem));
+}
+//---------------------------------------------------------------------------
+
+//Usuwanie separatora
+void DestroySeparatorItem()
+{
+	TPluginAction SeparatorItem;
+	ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
+	SeparatorItem.cbSize = sizeof(TPluginAction);
+	SeparatorItem.pszName = L"tweetIMSeparatorItem";
+	SeparatorItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SeparatorItem));
+}
+//---------------------------------------------------------------------------
+//Tworzenie separatora
+void BuildSeparatorItem()
+{
+	TPluginAction SeparatorItem;
+	ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
+	SeparatorItem.cbSize = sizeof(TPluginAction);
+	SeparatorItem.pszName = L"tweetIMSeparatorItem";
+	SeparatorItem.pszCaption = L"-";
+	SeparatorItem.Position = 0;
+	SeparatorItem.IconIndex = 0;
+	SeparatorItem.pszPopupName = L"popURL";
+	SeparatorItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SeparatorItem));
+}
+//---------------------------------------------------------------------------
+
+//Usuwanie buttona z komendami bota
+void DestroyCommandItems()
+{
+	//Usuwanie "Pobierz nieprzeczytane tweety"
+	TPluginAction UpdateCommandItem;
+	ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
+	UpdateCommandItem.cbSize = sizeof(TPluginAction);
+	UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UpdateCommandItem));
+	//Usuwanie "Obserwowani"
+	TPluginAction IngCommandItem;
+	ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
+	IngCommandItem.cbSize = sizeof(TPluginAction);
+	IngCommandItem.pszName = L"tweetIMIngCommandItem";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&IngCommandItem));
+	//Usuwanie "Obserwuj¹cy"
+	TPluginAction ErsCommandItem;
+	ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
+	ErsCommandItem.cbSize = sizeof(TPluginAction);
+	ErsCommandItem.pszName = L"tweetIMErsCommandItem";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
+	//Usuwanie "Usun poprzednie tweetniecie"
+	TPluginAction UndoTweetCommandItem;
+	ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
+	UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
+	UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
+	//Usuwanie "Zapisane wyszukiwania"
+	TPluginAction SavedSearchesCommandItem;
+	ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
+	SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
+	SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
+	//Usuwanie buttona w oknie rozmowy
+	TPluginAction CommandButton;
+	ZeroMemory(&CommandButton,sizeof(TPluginAction));
+	CommandButton.cbSize = sizeof(TPluginAction);
+	CommandButton.pszName = L"tweetIMCommandButton";
+	CommandButton.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_DESTROYBUTTON ,0,(LPARAM)(&CommandButton));
+}
+//---------------------------------------------------------------------------
+
+//Tworzenie buttona z komendami bota
+void BuildCommandItems()
+{
+	//Usuwanie buttona z komendami bota
+	DestroyCommandItems();
+	//Tworzenie buttona z komendami bota
+	if(hFrmSend)
+	{
+		//Tworzenie buttona w oknie rozmowy
+		TPluginAction CommandButton;
+		ZeroMemory(&CommandButton,sizeof(TPluginAction));
+		CommandButton.cbSize = sizeof(TPluginAction);
+		CommandButton.pszName = L"tweetIMCommandButton";
+		CommandButton.Hint = L"Komendy bota tweet.IM";
+		CommandButton.Position = 0;
+		CommandButton.IconIndex = 131;
+		CommandButton.pszPopupName = L"tweetIMCommandPopUp";
+		CommandButton.Handle = (int)hFrmSend;
+		PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_CREATEBUTTON,0,(LPARAM)(&CommandButton));
+		//Tworzenie "Zapisane wyszukiwania"
+		TPluginAction SavedSearchesCommandItem;
+		ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
+		SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
+		SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
+		SavedSearchesCommandItem.pszCaption = L"Zapisane wyszukiwania";
+		SavedSearchesCommandItem.Position = 0;
+		SavedSearchesCommandItem.IconIndex = 16;
+		SavedSearchesCommandItem.pszService = L"stweetIMSavedSearcheCommandItem";
+		SavedSearchesCommandItem.pszPopupName = L"tweetIMCommandPopUp";
+		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SavedSearchesCommandItem));
+		//Tworzenie "Usun poprzednie tweetniecie"
+		TPluginAction UndoTweetCommandItem;
+		ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
+		UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
+		UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
+		UndoTweetCommandItem.pszCaption = L"Usuñ poprzednie tweetniêcie";
+		UndoTweetCommandItem.Position = 0;
+		UndoTweetCommandItem.IconIndex = 10;
+		UndoTweetCommandItem.pszService = L"stweetIMUndoTweetCommandItem";
+		UndoTweetCommandItem.pszPopupName = L"tweetIMCommandPopUp";
+		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&UndoTweetCommandItem));
+		//Tworzenie "Obserwuj¹cy"
+		TPluginAction ErsCommandItem;
+		ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
+		ErsCommandItem.cbSize = sizeof(TPluginAction);
+		ErsCommandItem.pszName = L"tweetIMErsCommandItem";
+		ErsCommandItem.pszCaption = L"Obserwuj¹cy";
+		ErsCommandItem.Position = 0;
+		ErsCommandItem.IconIndex = 21;
+		ErsCommandItem.pszService = L"stweetIMErsCommandItem";
+		ErsCommandItem.pszPopupName = L"tweetIMCommandPopUp";
+		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ErsCommandItem));
+		//Tworzenie "Obserwowani"
+		TPluginAction IngCommandItem;
+		ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
+		IngCommandItem.cbSize = sizeof(TPluginAction);
+		IngCommandItem.pszName = L"tweetIMIngCommandItem";
+		IngCommandItem.pszCaption = L"Obserwowani";
+		IngCommandItem.Position = 0;
+		IngCommandItem.IconIndex = 21;
+		IngCommandItem.pszService = L"stweetIMIngCommandItem";
+		IngCommandItem.pszPopupName = L"tweetIMCommandPopUp";
+		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&IngCommandItem));
+		//Tworzenie "Pobierz nieprzeczytane tweety"
+		TPluginAction UpdateCommandItem;
+		ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
+		UpdateCommandItem.cbSize = sizeof(TPluginAction);
+		UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
+		UpdateCommandItem.pszCaption = L"Pobierz nieprzeczytane tweety";
+		UpdateCommandItem.Position = 0;
+		UpdateCommandItem.IconIndex = 19;
+		UpdateCommandItem.pszService = L"stweetIMUpdateCommandItem";
+		UpdateCommandItem.pszPopupName = L"tweetIMCommandPopUp";
+		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&UpdateCommandItem));
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -851,127 +1190,6 @@ INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam)
 	PluginLink.CallService(AQQ_CONTACTS_SENDMSG ,(WPARAM)(&PluginContact),(LPARAM)(&PluginMessage));
 
 	return 0;
-}
-//---------------------------------------------------------------------------
-
-//Usuwanie buttona z komendami bota
-void DestroyCommandItems()
-{
-	//Usuwanie "Pobierz nieprzeczytane tweety"
-	TPluginAction UpdateCommandItem;
-	ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
-	UpdateCommandItem.cbSize = sizeof(TPluginAction);
-	UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UpdateCommandItem));
-	//Usuwanie "Obserwowani"
-	TPluginAction IngCommandItem;
-	ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
-	IngCommandItem.cbSize = sizeof(TPluginAction);
-	IngCommandItem.pszName = L"tweetIMIngCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&IngCommandItem));
-	//Usuwanie "Obserwuj¹cy"
-	TPluginAction ErsCommandItem;
-	ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
-	ErsCommandItem.cbSize = sizeof(TPluginAction);
-	ErsCommandItem.pszName = L"tweetIMErsCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
-	//Usuwanie "Usun poprzednie tweetniecie"
-	TPluginAction UndoTweetCommandItem;
-	ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
-	UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
-	UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
-	//Usuwanie "Zapisane wyszukiwania"
-	TPluginAction SavedSearchesCommandItem;
-	ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
-	SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
-	SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
-	//Usuwanie buttona w oknie rozmowy
-	TPluginAction CommandButton;
-	ZeroMemory(&CommandButton,sizeof(TPluginAction));
-	CommandButton.cbSize = sizeof(TPluginAction);
-	CommandButton.pszName = L"tweetIMCommandButton";
-	CommandButton.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_DESTROYBUTTON ,0,(LPARAM)(&CommandButton));
-}
-//---------------------------------------------------------------------------
-
-//Tworzenie buttona z komendami bota
-void BuildCommandItems()
-{
-	//Usuwanie buttona
-	DestroyCommandItems();
-	//Tworzenie buttona
-	if(hFrmSend)
-	{
-		//Tworzenie buttona w oknie rozmowy
-		TPluginAction CommandButton;
-		ZeroMemory(&CommandButton,sizeof(TPluginAction));
-		CommandButton.cbSize = sizeof(TPluginAction);
-		CommandButton.pszName = L"tweetIMCommandButton";
-		CommandButton.Hint = L"Komendy bota tweet.IM";
-		CommandButton.Position = 0;
-		CommandButton.IconIndex = 131;
-		CommandButton.pszPopupName = L"tweetIMCommandPopUp";
-		CommandButton.Handle = (int)hFrmSend;
-		PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_CREATEBUTTON,0,(LPARAM)(&CommandButton));
-		//Tworzenie "Zapisane wyszukiwania"
-		TPluginAction SavedSearchesCommandItem;
-		ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
-		SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
-		SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
-		SavedSearchesCommandItem.pszCaption = L"Zapisane wyszukiwania";
-		SavedSearchesCommandItem.Position = 0;
-		SavedSearchesCommandItem.IconIndex = 16;
-		SavedSearchesCommandItem.pszService = L"stweetIMSavedSearcheCommandItem";
-		SavedSearchesCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SavedSearchesCommandItem));
-		//Tworzenie "Usun poprzednie tweetniecie"
-		TPluginAction UndoTweetCommandItem;
-		ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
-		UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
-		UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
-		UndoTweetCommandItem.pszCaption = L"Usuñ poprzednie tweetniêcie";
-		UndoTweetCommandItem.Position = 0;
-		UndoTweetCommandItem.IconIndex = 10;
-		UndoTweetCommandItem.pszService = L"stweetIMUndoTweetCommandItem";
-		UndoTweetCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&UndoTweetCommandItem));
-		//Tworzenie "Obserwuj¹cy"
-		TPluginAction ErsCommandItem;
-		ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
-		ErsCommandItem.cbSize = sizeof(TPluginAction);
-		ErsCommandItem.pszName = L"tweetIMErsCommandItem";
-		ErsCommandItem.pszCaption = L"Obserwuj¹cy";
-		ErsCommandItem.Position = 0;
-		ErsCommandItem.IconIndex = 21;
-		ErsCommandItem.pszService = L"stweetIMErsCommandItem";
-		ErsCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ErsCommandItem));
-		//Tworzenie "Obserwowani"
-		TPluginAction IngCommandItem;
-		ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
-		IngCommandItem.cbSize = sizeof(TPluginAction);
-		IngCommandItem.pszName = L"tweetIMIngCommandItem";
-		IngCommandItem.pszCaption = L"Obserwowani";
-		IngCommandItem.Position = 0;
-		IngCommandItem.IconIndex = 21;
-		IngCommandItem.pszService = L"stweetIMIngCommandItem";
-		IngCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&IngCommandItem));
-		//Tworzenie "Pobierz nieprzeczytane tweety"
-		TPluginAction UpdateCommandItem;
-		ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
-		UpdateCommandItem.cbSize = sizeof(TPluginAction);
-		UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
-		UpdateCommandItem.pszCaption = L"Pobierz nieprzeczytane tweety";
-		UpdateCommandItem.Position = 0;
-		UpdateCommandItem.IconIndex = 19;
-		UpdateCommandItem.pszService = L"stweetIMUpdateCommandItem";
-		UpdateCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&UpdateCommandItem));
-	}
 }
 //---------------------------------------------------------------------------
 
@@ -1482,48 +1700,13 @@ INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 {
 	//Domyslne usuwanie elementow
-	TPluginAction InsertTagItem;
-	ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
-	InsertTagItem.cbSize = sizeof(TPluginAction);
-	InsertTagItem.pszName = L"tweetIMInsertTagItem";
-	InsertTagItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertTagItem));
-	TPluginAction InsertNickItem;
-	ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
-	InsertNickItem.cbSize = sizeof(TPluginAction);
-	InsertNickItem.pszName = L"tweetIMInsertNickItem";
-	InsertNickItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertNickItem));
-	TPluginAction SendPrivMsgItem;
-	ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
-	SendPrivMsgItem.cbSize = sizeof(TPluginAction);
-	SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
-	SendPrivMsgItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SendPrivMsgItem));
-	TPluginAction LikeLastTweetItem;
-	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
-	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
-	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
-	LikeLastTweetItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
-	TPluginAction ShowTimelineItem;
-	ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
-	ShowTimelineItem.cbSize = sizeof(TPluginAction);
-	ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
-	ShowTimelineItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowTimelineItem));
-	TPluginAction ShowUserProfileItem;
-	ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
-	ShowUserProfileItem.cbSize = sizeof(TPluginAction);
-	ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
-	ShowUserProfileItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowUserProfileItem));
-	TPluginAction SeparatorItem;
-	ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
-	SeparatorItem.cbSize = sizeof(TPluginAction);
-	SeparatorItem.pszName = L"tweetIMSeparatorItem";
-	SeparatorItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SeparatorItem));
+	DestroyInsertTagItem();
+	DestroyInsertNickItem();
+	DestroySendPrivMsgItem();
+	DestroyLikeLastTweetItem();
+	DestroyShowTimelineItem();
+	DestroyShowUserProfileItem();
+	DestroySeparatorItem();
 	//Kasowanie zapamietanych danych
 	ItemCopyData = "";
 	//Jezeli zezwolono na sprawdzanie danych
@@ -1544,24 +1727,9 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 					//Kopiowanie tag'u
 					ItemCopyData = "#" + CopyData;
 					//Tworzenie separatora
-					SeparatorItem.cbSize = sizeof(TPluginAction);
-					SeparatorItem.pszName = L"tweetIMSeparatorItem";
-					SeparatorItem.pszCaption = L"-";
-					SeparatorItem.Position = 0;
-					SeparatorItem.IconIndex = 0;
-					SeparatorItem.pszPopupName = L"popURL";
-					SeparatorItem.Handle = (int)hFrmSend;
-					PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SeparatorItem));
+	  				BuildSeparatorItem();
 					//Tworzenie elementu wstawiania tagu
-					InsertTagItem.cbSize = sizeof(TPluginAction);
-					InsertTagItem.pszName = L"tweetIMInsertTagItem";
-					InsertTagItem.pszCaption = ("Wstaw " + ItemCopyData).w_str();
-					InsertTagItem.Position = 0;
-					InsertTagItem.IconIndex = 11;
-					InsertTagItem.pszService = L"stweetIMInsertTagItem";
-					InsertTagItem.pszPopupName = L"popURL";
-					InsertTagItem.Handle = (int)hFrmSend;
-					PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&InsertTagItem));
+					BuildInsertTagItem();
 				}
 			}
 		}
@@ -1575,74 +1743,17 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 				//Kopiowanie nick'a
 				ItemCopyData = CopyData;
 				//Tworzenie separatora
-				SeparatorItem.cbSize = sizeof(TPluginAction);
-				SeparatorItem.pszName = L"tweetIMSeparatorItem";
-				SeparatorItem.pszCaption = L"-";
-				SeparatorItem.Position = 0;
-				SeparatorItem.IconIndex = 0;
-				SeparatorItem.pszPopupName = L"popURL";
-				SeparatorItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SeparatorItem));
+				BuildSeparatorItem();
 				//Tworzenie elementu do pokazywania informacji o uzytkowniku
-				TPluginAction ShowUserProfileItem;
-				ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
-				ShowUserProfileItem.cbSize = sizeof(TPluginAction);
-				ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
-				ShowUserProfileItem.pszCaption = L"Poka¿ informacje o u¿ytkowniku";
-				ShowUserProfileItem.Position = 0;
-				ShowUserProfileItem.IconIndex = 21;
-				ShowUserProfileItem.pszService = L"stweetIMShowUserProfileItem";
-				ShowUserProfileItem.pszPopupName = L"popURL";
-				ShowUserProfileItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowUserProfileItem));
+				BuildShowUserProfileItem();
 				//Tworzenie elementu do pokazywania najnowszych tweetniec uzytkownika
-				TPluginAction ShowTimelineItem;
-				ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
-				ShowTimelineItem.cbSize = sizeof(TPluginAction);
-				ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
-				ShowTimelineItem.pszCaption = L"Poka¿ najnowsze tweetniêcia";
-				ShowTimelineItem.Position = 0;
-				ShowTimelineItem.IconIndex = 21;
-				ShowTimelineItem.pszService = L"stweetIMShowTimelineItem";
-				ShowTimelineItem.pszPopupName = L"popURL";
-				ShowTimelineItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&ShowTimelineItem));
+				BuildShowTimelineItem();
 				//Tworzenie elementu lajkowania ostatniego tweetniecia
-				TPluginAction LikeLastTweetItem;
-				ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
-				LikeLastTweetItem.cbSize = sizeof(TPluginAction);
-				LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
-				LikeLastTweetItem.pszCaption = L"Polub ostatnie tweetniêcie";
-				LikeLastTweetItem.Position = 0;
-				LikeLastTweetItem.IconIndex = 157;
-				LikeLastTweetItem.pszService = L"stweetIMLikeLastTweetItem";
-				LikeLastTweetItem.pszPopupName = L"popURL";
-				LikeLastTweetItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&LikeLastTweetItem));
+				BuildLikeLastTweetItem();
 				//Tworzenie elementu wysylania prywatnej wiadomosci
-				TPluginAction SendPrivMsgItem;
-				ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
-				SendPrivMsgItem.cbSize = sizeof(TPluginAction);
-				SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
-				SendPrivMsgItem.pszCaption = L"Wiadomoœæ prywatna";
-				SendPrivMsgItem.Position = 0;
-				SendPrivMsgItem.IconIndex = 8;
-				SendPrivMsgItem.pszService = L"stweetIMSendPrivMsgItem";
-				SendPrivMsgItem.pszPopupName = L"popURL";
-				SendPrivMsgItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SendPrivMsgItem));
+				BuildSendPrivMsgItem();
 				//Tworzenie elementu wstawiania nicku
-				TPluginAction InsertNickItem;
-				ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
-				InsertNickItem.cbSize = sizeof(TPluginAction);
-				InsertNickItem.pszName = L"tweetIMInsertNickItem";
-				InsertNickItem.pszCaption = ("Wstaw @" + ItemCopyData).w_str();
-				InsertNickItem.Position = 0;
-				InsertNickItem.IconIndex = 11;
-				InsertNickItem.pszService = L"stweetIMInsertNickItem";
-				InsertNickItem.pszPopupName = L"popURL";
-				InsertNickItem.Handle = (int)hFrmSend;
-				PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&InsertNickItem));
+				BuildInsertNickItem();
 			}
 		}
 	}
@@ -1942,12 +2053,8 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	//Tworzenie katalogu z awatarami
 	if(!DirectoryExists(AvatarsDir))
 		CreateDir(AvatarsDir);
-	//Tworzenie PopUpMenu
-	TPluginAction CommandPopUp;
-	ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
-	CommandPopUp.cbSize = sizeof(TPluginAction);
-	CommandPopUp.pszName = L"tweetIMCommandPopUp";
-	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENU,0,(LPARAM)(&CommandPopUp));
+	//Tworzenie menu dla elementow wtyczki
+	BuildPopupMenu();
 	//Tworzenie serwisow
 	//Szybki dostep do ustawien wtyczki
 	PluginLink.CreateServiceFunction(L"stweetIMFastSettingsItem",ServicetweetIMFastSettingsItem);
@@ -2050,90 +2157,16 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 	PluginLink.UnhookEvent(OnThemeChanged);
 	PluginLink.UnhookEvent(OnXMLDebug);
 	//Usuwanie elementow z interfejsu AQQ
-	TPluginAction FastSettingsItem;
-	ZeroMemory(&FastSettingsItem,sizeof(TPluginAction));
-	FastSettingsItem.cbSize = sizeof(TPluginAction);
-	FastSettingsItem.pszName = L"tweetIMFastSettingsItemButton";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM,0,(LPARAM)(&FastSettingsItem));
-	TPluginAction InsertTagItem;
-	ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
-	InsertTagItem.cbSize = sizeof(TPluginAction);
-	InsertTagItem.pszName = L"tweetIMInsertTagItem";
-	InsertTagItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertTagItem));
-	TPluginAction InsertNickItem;
-	ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
-	InsertNickItem.cbSize = sizeof(TPluginAction);
-	InsertNickItem.pszName = L"tweetIMInsertNickItem";
-	InsertNickItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&InsertNickItem));
-	TPluginAction SendPrivMsgItem;
-	ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
-	SendPrivMsgItem.cbSize = sizeof(TPluginAction);
-	SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
-	SendPrivMsgItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SendPrivMsgItem));
-	TPluginAction LikeLastTweetItem;
-	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
-	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
-	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
-	LikeLastTweetItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
-	TPluginAction ShowTimelineItem;
-	ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
-	ShowTimelineItem.cbSize = sizeof(TPluginAction);
-	ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
-	ShowTimelineItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowTimelineItem));
-	TPluginAction ShowUserProfileItem;
-	ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
-	ShowUserProfileItem.cbSize = sizeof(TPluginAction);
-	ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
-	ShowUserProfileItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ShowUserProfileItem));
-	TPluginAction SeparatorItem;
-	ZeroMemory(&SeparatorItem,sizeof(TPluginAction));
-	SeparatorItem.cbSize = sizeof(TPluginAction);
-	SeparatorItem.pszName = L"tweetIMSeparatorItem";
-	SeparatorItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SeparatorItem));
-	TPluginAction UpdateCommandItem;
-	ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
-	UpdateCommandItem.cbSize = sizeof(TPluginAction);
-	UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UpdateCommandItem));
-	TPluginAction IngCommandItem;
-	ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
-	IngCommandItem.cbSize = sizeof(TPluginAction);
-	IngCommandItem.pszName = L"tweetIMIngCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&IngCommandItem));
-	TPluginAction ErsCommandItem;
-	ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
-	ErsCommandItem.cbSize = sizeof(TPluginAction);
-	ErsCommandItem.pszName = L"tweetIMErsCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
-	TPluginAction UndoTweetCommandItem;
-	ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
-	UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
-	UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
-	TPluginAction SavedSearchesCommandItem;
-	ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
-	SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
-	SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
-	TPluginAction CommandButton;
-	ZeroMemory(&CommandButton,sizeof(TPluginAction));
-	CommandButton.cbSize = sizeof(TPluginAction);
-	CommandButton.pszName = L"tweetIMCommandButton";
-	CommandButton.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_DESTROYBUTTON ,0,(LPARAM)(&CommandButton));
-	//Usuwanie PopUpMenu
-	TPluginAction CommandPopUp;
-	ZeroMemory(&CommandPopUp,sizeof(TPluginAction));
-	CommandPopUp.cbSize = sizeof(TPluginAction);
-	CommandPopUp.pszName = L"tweetIMCommandPopUp";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENU,0,(LPARAM)(&CommandPopUp));
+	DestroytweetIMFastSettings();
+	DestroyInsertTagItem();
+	DestroyInsertNickItem();
+	DestroySendPrivMsgItem();
+	DestroyLikeLastTweetItem();
+	DestroyShowTimelineItem();
+	DestroyShowUserProfileItem();
+	DestroySeparatorItem();
+	DestroyCommandItems();
+	DestroyPopupMenu();
 	//Usuwanie serwisow
 	PluginLink.DestroyServiceFunction(ServicetweetIMFastSettingsItem);
 	PluginLink.DestroyServiceFunction(ServiceInsertTagItem);
