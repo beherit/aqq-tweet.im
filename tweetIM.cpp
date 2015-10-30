@@ -81,6 +81,7 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnPrimaryTab(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnXMLDebug(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam);
@@ -1774,6 +1775,75 @@ INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 }
 //---------------------------------------------------------------------------
 
+//Hook na odbieranie pakietow XML
+INT_PTR __stdcall OnXMLDebug(WPARAM wParam, LPARAM lParam)
+{
+	//Pobranie informacji nt. pakietu XML
+	TPluginXMLChunk XMLChunk = *(PPluginXMLChunk)lParam ;
+	//Pobranie nadawcy pakietu XML
+	UnicodeString XMLSender = (wchar_t*)XMLChunk.From;
+	//Pakiet wyslany od bota tweet.IM
+	if(XMLSender.Pos("@twitter.tweet.im"))
+	{
+		//Pobranie pakietu XML
+		UnicodeString XML = (wchar_t*)wParam;
+		//Kodowanie pakietu
+		XML = UTF8ToUnicodeString(XML.w_str());
+		//Parsowanie pakietu XML
+		_di_IXMLDocument XMLDoc = LoadXMLData(XML);
+		_di_IXMLNode MainNode = XMLDoc->DocumentElement;
+		int ItemsCount = MainNode->ChildNodes->GetCount();
+		for(int Count=0;Count<ItemsCount;Count++)
+		{
+			_di_IXMLNode ChildNodes = MainNode->ChildNodes->GetNode(Count);
+			//Wiadomosc zawiera dodatkowe informacje
+			if(ChildNodes->NodeName=="x")
+			{
+				//Dodatkowe informacje o wiadomosci od bota tweet.IM
+				if(ChildNodes->Attributes["xmlns"]=="http://process-one.net/threads")
+				{
+					//Zwykly tweet
+					if(ChildNodes->Attributes["type"]=="tweet")
+					{
+						//Pobieranie informacji o nadawcy wiadomosci
+						UnicodeString twitter_nick = ChildNodes->Attributes["twitter-nick"];
+						UnicodeString avatar_url = ChildNodes->Attributes["avatar-url"];
+						//Dane zostaly pobrane
+						if((!twitter_nick.IsEmpty())&&(!avatar_url.IsEmpty()))
+						{
+							//Tworzenie katalogu z awatarami
+							if(!DirectoryExists(AvatarsDir))
+								CreateDir(AvatarsDir);
+							//Awatara nie ma w folderze cache
+							if(!FileExists(AvatarsDir + "\\\\" + twitter_nick))
+							{
+								//Tworzenie nowego pliku w pamieci
+								TMemoryStream* MemFile = new TMemoryStream;
+								MemFile->Position = 0;
+								//Pobieranie awatara
+								if(hTweetForm->IdHTTPGetFileToMem(MemFile,avatar_url))
+								{
+									MemFile->Position = 0;
+									if(MemFile->Size!=0)
+									{
+										MemFile->SaveToFile(GetAvatarsDir() + "\\\\" + twitter_nick);
+										delete MemFile;
+									}
+									else delete MemFile;
+								}
+								else delete MemFile;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
 //Zapisywanie zasobów
 void ExtractRes(wchar_t* FileName, wchar_t* ResName, wchar_t* ResType)
 {
@@ -1933,6 +2003,8 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	PluginLink.HookEvent(AQQ_CONTACTS_RECVMSG,OnRecvMsg);
 	//Hook na zmiane kompozycji (pobranie stylu zalacznikow oraz zmiana skorkowania wtyczki)
 	PluginLink.HookEvent(AQQ_SYSTEM_THEMECHANGED,OnThemeChanged);
+	//Hook na odbieranie pakietow XML
+	PluginLink.HookEvent(AQQ_SYSTEM_XMLDEBUG,OnXMLDebug);
 	//Odczyt ustawien
 	LoadSettings();
 	//Pobranie stylu Avatars
@@ -1987,6 +2059,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 	PluginLink.UnhookEvent(OnPerformCopyData);
 	PluginLink.UnhookEvent(OnRecvMsg);
 	PluginLink.UnhookEvent(OnThemeChanged);
+	PluginLink.UnhookEvent(OnXMLDebug);
 	//Usuwanie elementow z interfejsu AQQ
 	TPluginAction FastSettingsItem;
 	ZeroMemory(&FastSettingsItem,sizeof(TPluginAction));
