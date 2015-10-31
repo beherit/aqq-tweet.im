@@ -41,7 +41,7 @@
 #pragma link "sSpeedButton"
 #pragma link "sSpinEdit"
 #pragma resource "*.dfm"
-TTweetForm *TweetForm;
+TSettingsForm *SettingsForm;
 //---------------------------------------------------------------------------
 __declspec(dllimport)UnicodeString GetPluginUserDir();
 __declspec(dllimport)UnicodeString GetPluginUserDirW();
@@ -65,13 +65,13 @@ __declspec(dllimport)UnicodeString EncodeBase64(UnicodeString Str);
 bool AnimateMode;
 bool ForceDisconnect = false;
 //---------------------------------------------------------------------------
-__fastcall TTweetForm::TTweetForm(TComponent* Owner)
+__fastcall TSettingsForm::TSettingsForm(TComponent* Owner)
 		: TForm(Owner)
 {
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::WMTransparency(TMessage &Message)
+void __fastcall TSettingsForm::WMTransparency(TMessage &Message)
 {
 	Application->ProcessMessages();
 	if(sSkinManager->Active) sSkinProvider->BorderForm->UpdateExBordersPos(true,(int)Message.LParam);
@@ -79,7 +79,7 @@ void __fastcall TTweetForm::WMTransparency(TMessage &Message)
 //---------------------------------------------------------------------------
 
 //Pobieranie pliku z danego URL
-bool __fastcall TTweetForm::IdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL)
+bool __fastcall TSettingsForm::IdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL)
 {
 	//Ustawianie pozycji pliku na poczatek
 	File->Position = 0;
@@ -131,7 +131,7 @@ bool __fastcall TTweetForm::IdHTTPGetFileToMem(TMemoryStream* File, UnicodeStrin
 //---------------------------------------------------------------------------
 
 //Pobieranie pliku z danego URL (dla auto/manual update awatarow)
-bool __fastcall TTweetForm::AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL)
+bool __fastcall TSettingsForm::AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL)
 {
 	//Ustawianie pozycji pliku na poczatek
 	File->Position = 0;
@@ -182,7 +182,7 @@ bool __fastcall TTweetForm::AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeStr
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::FormCreate(TObject *Sender)
+void __fastcall TSettingsForm::FormCreate(TObject *Sender)
 {
 	//Wlaczona zaawansowana stylizacja okien
 	if(ChkSkinEnabled())
@@ -214,7 +214,7 @@ void __fastcall TTweetForm::FormCreate(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::FormShow(TObject *Sender)
+void __fastcall TSettingsForm::FormShow(TObject *Sender)
 {
 	//Wlaczona zaawansowana stylizacja okien
 	if(sSkinManager->Active)
@@ -242,7 +242,7 @@ void __fastcall TTweetForm::FormShow(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::aLoadSettingsExecute(TObject *Sender)
+void __fastcall TSettingsForm::aLoadSettingsExecute(TObject *Sender)
 {
 	TIniFile *Ini = new TIniFile( GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
 	//Awatary
@@ -292,7 +292,7 @@ void __fastcall TTweetForm::aLoadSettingsExecute(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::aSaveSettingsExecute(TObject *Sender)
+void __fastcall TSettingsForm::aSaveSettingsExecute(TObject *Sender)
 {
 	TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
 	//Awatary
@@ -311,7 +311,7 @@ void __fastcall TTweetForm::aSaveSettingsExecute(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::aSettingsChangedExecute(TObject *Sender)
+void __fastcall TSettingsForm::aSettingsChangedExecute(TObject *Sender)
 {
 	//Aktywowanie przycisku zapisywania ustawien
 	SaveButton->Enabled = true;
@@ -319,7 +319,7 @@ void __fastcall TTweetForm::aSettingsChangedExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 
 //Wymuszanie rozlaczenia sie protokolow HTTP
-void __fastcall TTweetForm::aForceDisconnectExecute(TObject *Sender)
+void __fastcall TSettingsForm::aForceDisconnectExecute(TObject *Sender)
 {
 	//Wymuszenie zakonczenie petli watkow
 	ForceDisconnect = true;
@@ -330,13 +330,13 @@ void __fastcall TTweetForm::aForceDisconnectExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 
 //Zamkniecie formy ustawien
-void __fastcall TTweetForm::aExitExecute(TObject *Sender)
+void __fastcall TSettingsForm::aExitExecute(TObject *Sender)
 {
 	Close();
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::SaveButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::SaveButtonClick(TObject *Sender)
 {
 	//Wylaczanie przyciskow
 	SaveButton->Enabled = false;
@@ -352,7 +352,7 @@ void __fastcall TTweetForm::SaveButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::OKButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::OKButtonClick(TObject *Sender)
 {
 	//Wylaczanie przyciskow
 	SaveButton->Enabled = false;
@@ -370,14 +370,14 @@ void __fastcall TTweetForm::OKButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AvatarWidthCSpinEditChange(TObject *Sender)
+void __fastcall TSettingsForm::AvatarWidthCSpinEditChange(TObject *Sender)
 {
 	AvatarHeightEdit->Text = AvatarWidthCSpinEdit->Value;
 	aSettingsChanged->Execute();
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AvatarsStyleMemoChange(TObject *Sender)
+void __fastcall TSettingsForm::AvatarsStyleMemoChange(TObject *Sender)
 {
 	//Zezwalanie/blokowanie zapisania stylu awatarow
 	if(AvatarsStyleMemo->Text.Pos("CC_AVATAR"))
@@ -390,7 +390,7 @@ void __fastcall TTweetForm::AvatarsStyleMemoChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AvatarStyleDefaultButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::AvatarStyleDefaultButtonClick(TObject *Sender)
 {
 	//Przywracanie domyslnego stylu awatarow
 	if(AvatarsStyleMemo->Text != "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
@@ -398,7 +398,7 @@ void __fastcall TTweetForm::AvatarStyleDefaultButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AvatarStyleSaveButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::AvatarStyleSaveButtonClick(TObject *Sender)
 {
 	//Zapisanie stylu awatarow do pliku
 	TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
@@ -424,7 +424,7 @@ void __fastcall TTweetForm::AvatarStyleSaveButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::EditAvatarsStyleLabelClick(TObject *Sender)
+void __fastcall TSettingsForm::EditAvatarsStyleLabelClick(TObject *Sender)
 {
 	//Wylaczanie timera animacji
 	if(AnimateTimer->Enabled)
@@ -452,7 +452,7 @@ void __fastcall TTweetForm::EditAvatarsStyleLabelClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::ManualAvatarsUpdateButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::ManualAvatarsUpdateButtonClick(TObject *Sender)
 {
 	if(ManualAvatarsUpdateButton->Caption=="SprawdŸ aktualizacje")
 	{
@@ -507,7 +507,7 @@ void __fastcall TTweetForm::ManualAvatarsUpdateButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::HighlightMsgCheckBoxClick(TObject *Sender)
+void __fastcall TSettingsForm::HighlightMsgCheckBoxClick(TObject *Sender)
 {
 	aSettingsChanged->Execute();
 	HighlightMsgListView->Enabled = HighlightMsgCheckBox->Checked;
@@ -521,14 +521,14 @@ void __fastcall TTweetForm::HighlightMsgCheckBoxClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::HighlightMsgListViewEdited(TObject *Sender, TListItem *Item,
+void __fastcall TSettingsForm::HighlightMsgListViewEdited(TObject *Sender, TListItem *Item,
 			UnicodeString &S)
 {
 	aSettingsChanged->Execute();
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::HighlightMsgListViewKeyDown(TObject *Sender, WORD &Key,
+void __fastcall TSettingsForm::HighlightMsgListViewKeyDown(TObject *Sender, WORD &Key,
 			TShiftState Shift)
 {
 	//Wcisniecie przycisku Delete
@@ -544,7 +544,7 @@ void __fastcall TTweetForm::HighlightMsgListViewKeyDown(TObject *Sender, WORD &K
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::HighlightMsgListViewSelectItem(TObject *Sender, TListItem *Item,
+void __fastcall TSettingsForm::HighlightMsgListViewSelectItem(TObject *Sender, TListItem *Item,
 			bool Selected)
 {
 	//Wczytyawanie elementow szybkiej edycji
@@ -559,7 +559,7 @@ void __fastcall TTweetForm::HighlightMsgListViewSelectItem(TObject *Sender, TLis
 //---------------------------------------------------------------------------
 
 //Przywrocenie domylsnych zawartosci kontrolek
-void __fastcall TTweetForm::EraseHighlightMsgSpeedButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::EraseHighlightMsgSpeedButtonClick(TObject *Sender)
 {
 	ItemHighlightMsgEdit->Text = "";
 	ColorHighlightMsgEdit->Text = "#FF0000";
@@ -568,7 +568,7 @@ void __fastcall TTweetForm::EraseHighlightMsgSpeedButtonClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 //Pobieranie koloru w HEX z komponentu
-void __fastcall TTweetForm::HighlightMsgColorSelectChange(TObject *Sender)
+void __fastcall TSettingsForm::HighlightMsgColorSelectChange(TObject *Sender)
 {
 	TColor Color = HighlightMsgColorSelect->ColorValue;
 	int R,G,B;
@@ -579,7 +579,7 @@ void __fastcall TTweetForm::HighlightMsgColorSelectChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AddHighlightMsgsSpeedButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::AddHighlightMsgsSpeedButtonClick(TObject *Sender)
 {
 	//Edycja juz dodanych elementow
 	if(HighlightMsgListView->ItemIndex!=-1)
@@ -634,7 +634,7 @@ void __fastcall TTweetForm::AddHighlightMsgsSpeedButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::RemoveHighlightMsgSpeedButtonClick(TObject *Sender)
+void __fastcall TSettingsForm::RemoveHighlightMsgSpeedButtonClick(TObject *Sender)
 {
 	//Usuwanie elementu
 	if(HighlightMsgListView->ItemIndex!=-1)
@@ -645,7 +645,7 @@ void __fastcall TTweetForm::RemoveHighlightMsgSpeedButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::HighlightMsgModeComboBoxChange(TObject *Sender)
+void __fastcall TSettingsForm::HighlightMsgModeComboBoxChange(TObject *Sender)
 {
 	aSettingsChanged->Execute();
 	if(HighlightMsgModeComboBox->ItemIndex==2)
@@ -654,7 +654,7 @@ void __fastcall TTweetForm::HighlightMsgModeComboBoxChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AnimateTimerTimer(TObject *Sender)
+void __fastcall TSettingsForm::AnimateTimerTimer(TObject *Sender)
 {
 	//Pokazywanie ukrytego panelu
 	if(AnimateMode)
@@ -673,7 +673,7 @@ void __fastcall TTweetForm::AnimateTimerTimer(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sender)
+void __fastcall TSettingsForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sender)
 {
 	//Petla aktualizacji
 	int NewAvatars=0;
@@ -739,7 +739,7 @@ void __fastcall TTweetForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sen
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sender)
+void __fastcall TSettingsForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sender)
 {
 	//Petla aktualizacji
 	int NewAvatars=0;
@@ -805,7 +805,7 @@ void __fastcall TTweetForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sende
 }
 //---------------------------------------------------------------------------*/
 
-void __fastcall TTweetForm::AUIdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
+void __fastcall TSettingsForm::AUIdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
 			__int64 AWorkCountMax)
 {
 	//Wlaczenie timera pilnujacego zawieszenie polaczenia
@@ -813,7 +813,7 @@ void __fastcall TTweetForm::AUIdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkM
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AUIdHTTPWork(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCount)
+void __fastcall TSettingsForm::AUIdHTTPWork(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCount)
 
 {
 	//Ponowne wlaczenie timera pilnujacego zawieszenie polaczenia
@@ -822,7 +822,7 @@ void __fastcall TTweetForm::AUIdHTTPWork(TObject *ASender, TWorkMode AWorkMode, 
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AUIdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
+void __fastcall TSettingsForm::AUIdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
 
 {
 	//Wylaczenie timera pilnujacego zawieszenie polaczenia
@@ -830,7 +830,7 @@ void __fastcall TTweetForm::AUIdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMod
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AUIdHTTPTimerTimer(TObject *Sender)
+void __fastcall TSettingsForm::AUIdHTTPTimerTimer(TObject *Sender)
 {
 	//Wylaczenie timera pilnujacego zawieszenie polaczenia
 	AUIdHTTPTimer->Enabled = false;
@@ -841,7 +841,7 @@ void __fastcall TTweetForm::AUIdHTTPTimerTimer(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::IdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
+void __fastcall TSettingsForm::IdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
 			__int64 AWorkCountMax)
 {
 	//Wlaczenie timera pilnujacego zawieszenie polaczenia
@@ -849,7 +849,7 @@ void __fastcall TTweetForm::IdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMod
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::IdHTTPWork(TObject *ASender, TWorkMode AWorkMode,
+void __fastcall TSettingsForm::IdHTTPWork(TObject *ASender, TWorkMode AWorkMode,
 			__int64 AWorkCount)
 {
 	//Ponowne wlaczenie timera pilnujacego zawieszenie polaczenia
@@ -858,14 +858,14 @@ void __fastcall TTweetForm::IdHTTPWork(TObject *ASender, TWorkMode AWorkMode,
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::IdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
+void __fastcall TSettingsForm::IdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
 {
 	//Wylaczenie timera pilnujacego zawieszenie polaczenia
 	AvatarsIdHTTPTimer->Enabled = false;
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::AvatarsIdHTTPTimerTimer(TObject *Sender)
+void __fastcall TSettingsForm::AvatarsIdHTTPTimerTimer(TObject *Sender)
 {
 	//Wylaczenie timera pilnujacego zawieszenie polaczenia
 	AvatarsIdHTTPTimer->Enabled = false;
@@ -876,7 +876,7 @@ void __fastcall TTweetForm::AvatarsIdHTTPTimerTimer(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
+void __fastcall TSettingsForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
 {
 	//Pobranie itemu z listy awatarow do pobrania
 	UnicodeString Data = GetAvatarsListItem();
@@ -909,7 +909,7 @@ void __fastcall TTweetForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::ColorHighlightMsgEditChange(TObject *Sender)
+void __fastcall TSettingsForm::ColorHighlightMsgEditChange(TObject *Sender)
 {
 	if((ColorHighlightMsgEdit->Text.Pos("#")==1)&&(ColorHighlightMsgEdit->Text.Length()==7))
 	{
@@ -929,7 +929,7 @@ void __fastcall TTweetForm::ColorHighlightMsgEditChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TTweetForm::sSkinManagerSysDlgInit(TacSysDlgData DlgData, bool &AllowSkinning)
+void __fastcall TSettingsForm::sSkinManagerSysDlgInit(TacSysDlgData DlgData, bool &AllowSkinning)
 {
 	AllowSkinning = false;
 }

@@ -1,4 +1,4 @@
-object TweetForm: TTweetForm
+object SettingsForm: TSettingsForm
   Left = 0
   Top = 3
   BorderIcons = [biSystemMenu]
@@ -222,6 +222,7 @@ object TweetForm: TTweetForm
         Caption = 'Rozmiar awatar'#243'w'
         TabOrder = 0
         SkinData.SkinSection = 'GROUPBOX'
+        Checked = False
         object PixelInfoLabel: TsLabel
           Left = 119
           Top = 23
@@ -264,15 +265,6 @@ object TweetForm: TTweetForm
           TabOrder = 1
           Text = '25'
           SkinData.SkinSection = 'EDIT'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
         end
         object AvatarWidthCSpinEdit: TsSpinEdit
           Left = 28
@@ -290,15 +282,6 @@ object TweetForm: TTweetForm
           Text = '25'
           OnChange = AvatarWidthCSpinEditChange
           SkinData.SkinSection = 'EDIT'
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
           MaxValue = 120
           MinValue = 15
           Value = 25
@@ -312,6 +295,7 @@ object TweetForm: TTweetForm
         Caption = 'Aktualizacja awatar'#243'w'
         TabOrder = 1
         SkinData.SkinSection = 'GROUPBOX'
+        Checked = False
         object LastAvatarsUpdateLabel: TsLabelFX
           Left = 144
           Top = 47
@@ -392,14 +376,6 @@ object TweetForm: TTweetForm
           BoundLabel.Active = True
           BoundLabel.Caption = 'Automatyczna aktualizacje awatar'#243'w:'
           BoundLabel.Indent = 2
-          BoundLabel.Font.Charset = EASTEUROPE_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
@@ -428,6 +404,7 @@ object TweetForm: TTweetForm
         Caption = 'Styl awatar'#243'w'
         TabOrder = 2
         SkinData.SkinSection = 'GROUPBOX'
+        Checked = False
         object AvatarsStyleLabel: TsLabel
           Left = 14
           Top = 20
@@ -522,15 +499,6 @@ object TweetForm: TTweetForm
           Text = 
             '<span style="display: inline-block; padding: 2px 4px '#13#10'0px 1px; ' +
             'vertical-align: middle;">CC_AVATAR</span>'#13#10
-          BoundLabel.Indent = 0
-          BoundLabel.Font.Charset = DEFAULT_CHARSET
-          BoundLabel.Font.Color = clWindowText
-          BoundLabel.Font.Height = -11
-          BoundLabel.Font.Name = 'Tahoma'
-          BoundLabel.Font.Style = []
-          BoundLabel.Layout = sclLeft
-          BoundLabel.MaxWidth = 0
-          BoundLabel.UseSkinColor = True
           SkinData.SkinSection = 'EDIT'
         end
       end
@@ -755,15 +723,6 @@ object TweetForm: TTweetForm
         Top = 36
         Width = 280
         Height = 113
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'EDIT'
         Columns = <
           item
@@ -795,15 +754,6 @@ object TweetForm: TTweetForm
         Text = '#FF0000'
         OnChange = ColorHighlightMsgEditChange
         SkinData.SkinSection = 'EDIT'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object ItemHighlightMsgEdit: TsEdit
         Left = 46
@@ -812,15 +762,6 @@ object TweetForm: TTweetForm
         Height = 21
         TabOrder = 2
         SkinData.SkinSection = 'EDIT'
-        BoundLabel.Indent = 0
-        BoundLabel.Font.Charset = DEFAULT_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
-        BoundLabel.Layout = sclLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
       end
       object HighlightMsgModeComboBox: TsComboBox
         Left = 17
@@ -831,14 +772,7 @@ object TweetForm: TTweetForm
         BoundLabel.Active = True
         BoundLabel.Caption = 'Spos'#243'b wyr'#243#380'niania wiadomo'#347'ci:'
         BoundLabel.Indent = 4
-        BoundLabel.Font.Charset = EASTEUROPE_CHARSET
-        BoundLabel.Font.Color = clWindowText
-        BoundLabel.Font.Height = -11
-        BoundLabel.Font.Name = 'Tahoma'
-        BoundLabel.Font.Style = []
         BoundLabel.Layout = sclTopLeft
-        BoundLabel.MaxWidth = 0
-        BoundLabel.UseSkinColor = True
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csOwnerDrawFixed
@@ -985,6 +919,7 @@ object TweetForm: TTweetForm
     AddedTitle.Font.Height = -11
     AddedTitle.Font.Name = 'Tahoma'
     AddedTitle.Font.Style = []
+    FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
     Left = 128
