@@ -892,8 +892,6 @@ object SettingsForm: TSettingsForm
     Request.ContentRangeEnd = -1
     Request.ContentRangeStart = -1
     Request.ContentRangeInstanceLength = -1
-    Request.CustomHeaders.Strings = (
-      'X-Blip-API: 0.02')
     Request.Pragma = 'no-cache'
     Request.Accept = '*/*'
     Request.BasicAuthentication = False
@@ -970,8 +968,6 @@ object SettingsForm: TSettingsForm
     Request.ContentRangeEnd = -1
     Request.ContentRangeStart = -1
     Request.ContentRangeInstanceLength = -1
-    Request.CustomHeaders.Strings = (
-      'X-Blip-API: 0.02')
     Request.Pragma = 'no-cache'
     Request.Accept = '*/*'
     Request.BasicAuthentication = False
