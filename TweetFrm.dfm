@@ -358,8 +358,8 @@ object SettingsForm: TSettingsForm
           Caption = 'Automatyczna aktualizacja:'
         end
         object FileListBox: TFileListBox
-          Left = 175
-          Top = 74
+          Left = 174
+          Top = 75
           Width = 115
           Height = 25
           FileType = [ftReadOnly, ftHidden, ftSystem, ftArchive, ftNormal]
@@ -369,8 +369,8 @@ object SettingsForm: TSettingsForm
         end
         object ManualAvatarsUpdateButton: TsButton
           Tag = 20
-          Left = 175
-          Top = 74
+          Left = 174
+          Top = 75
           Width = 115
           Height = 25
           Caption = 'Sprawd'#378' aktualizacje'
@@ -837,7 +837,7 @@ object SettingsForm: TSettingsForm
     Visible = False
   end
   object ActionList: TActionList
-    Left = 96
+    Left = 64
     Top = 264
     object aLoadSettings: TAction
       Caption = 'aLoadSettings'
@@ -904,12 +904,6 @@ object SettingsForm: TSettingsForm
     Left = 64
     Top = 296
   end
-  object AnimateTimer: TTimer
-    Enabled = False
-    Interval = 15
-    OnTimer = AnimateTimerTimer
-    Top = 264
-  end
   object sSkinManager: TsSkinManager
     ExtendedBorders = True
     AnimEffects.FormShow.Time = 200
@@ -948,7 +942,7 @@ object SettingsForm: TSettingsForm
     ThirdParty.ThirdStaticText = ' '
     ThirdParty.ThirdNativePaint = ' '
     OnSysDlgInit = sSkinManagerSysDlgInit
-    Left = 160
+    Left = 128
     Top = 264
   end
   object sSkinProvider: TsSkinProvider
@@ -960,7 +954,7 @@ object SettingsForm: TSettingsForm
     FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 128
+    Left = 96
     Top = 264
   end
   object IdHTTP: TIdHTTP
@@ -992,14 +986,13 @@ object SettingsForm: TSettingsForm
     Enabled = False
     Interval = 10000
     OnTimer = AUIdHTTPTimerTimer
-    Left = 64
+    Left = 32
     Top = 264
   end
   object AvatarsIdHTTPTimer: TTimer
     Enabled = False
     Interval = 10000
     OnTimer = AvatarsIdHTTPTimerTimer
-    Left = 32
     Top = 264
   end
   object IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL
@@ -1025,7 +1018,7 @@ object SettingsForm: TSettingsForm
   object Taskbar: TTaskbar
     TaskBarButtons = <>
     TabProperties = []
-    Left = 194
-    Top = 270
+    Left = 162
+    Top = 262
   end
 end
