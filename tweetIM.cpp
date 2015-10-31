@@ -1994,7 +1994,10 @@ void LoadSettings()
 	AvatarSize = Ini->ReadInteger("Avatars","Size",25);
 	StaticAvatarStyle = DecodeBase64(Ini->ReadString("Avatars64","Style","").Trim().w_str());
 	if(StaticAvatarStyle=="<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
+	{
+		Ini->DeleteKey("Avatars64","Style");
 		StaticAvatarStyle = "";
+	}
 	//Wyroznianie
 	HighlightMsgChk = Ini->ReadBool("HighlightMsg","Enabled",false);
 	HighlightMsgModeChk= Ini->ReadInteger("HighlightMsg","Mode",0);
