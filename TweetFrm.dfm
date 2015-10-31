@@ -1,6 +1,8 @@
 object SettingsForm: TSettingsForm
+  Tag = 1
   Left = 0
   Top = 3
+  ActiveControl = AvatarWidthCSpinEdit
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'tweet.IM - ustawienia'
@@ -165,6 +167,7 @@ object SettingsForm: TSettingsForm
     ExplicitWidth = 50
   end
   object SaveButton: TsButton
+    Tag = 2
     Left = 252
     Top = 300
     Width = 75
@@ -176,6 +179,7 @@ object SettingsForm: TSettingsForm
     SkinData.SkinSection = 'BUTTON'
   end
   object CancelButton: TsButton
+    Tag = 3
     Left = 171
     Top = 300
     Width = 75
@@ -186,6 +190,7 @@ object SettingsForm: TSettingsForm
     SkinData.SkinSection = 'BUTTON'
   end
   object OKButton: TsButton
+    Tag = 4
     Left = 90
     Top = 300
     Width = 75
@@ -211,44 +216,46 @@ object SettingsForm: TSettingsForm
     TabOrder = 3
     SkinData.SkinSection = 'PAGECONTROL'
     object AvatarsTabSheet: TsTabSheet
+      Tag = 5
       Caption = 'Awatary'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
       object AvatarsSizeGroupBox: TsGroupBox
+        Tag = 7
         Left = 7
         Top = 3
         Width = 299
         Height = 71
-        Caption = 'Rozmiar awatar'#243'w'
+        Caption = 'Rozmiar'
         TabOrder = 0
         SkinData.SkinSection = 'GROUPBOX'
         Checked = False
         object PixelInfoLabel: TsLabel
-          Left = 119
+          Left = 105
           Top = 23
-          Width = 153
+          Width = 12
           Height = 13
-          Caption = '(warto'#347#263' wyra'#380'ona w pikselach)'
-          Enabled = False
+          Caption = 'px'
         end
         object AvatarInfoLabel: TsLabel
+          Tag = 8
           Left = 14
           Top = 48
-          Width = 273
+          Width = 218
           Height = 13
           SkinSection = 'LABEL'
-          Caption = 'Rozmiar awatar'#243'w mo'#380'e by'#263' ustalony przez kompozycj'#281'!'
+          Caption = 'Rozmiar mo'#380'e by'#263' ustalony przez kompozycj'#281
           Enabled = False
         end
         object XSizeLabel: TsLabel
-          Left = 75
+          Left = 61
           Top = 23
           Width = 6
           Height = 13
           Caption = 'x'
         end
         object AvatarHeightEdit: TsEdit
-          Left = 87
+          Left = 73
           Top = 20
           Width = 26
           Height = 21
@@ -267,7 +274,7 @@ object SettingsForm: TSettingsForm
           SkinData.SkinSection = 'EDIT'
         end
         object AvatarWidthCSpinEdit: TsSpinEdit
-          Left = 28
+          Left = 14
           Top = 20
           Width = 41
           Height = 21
@@ -288,16 +295,18 @@ object SettingsForm: TSettingsForm
         end
       end
       object AvatarsUpdateGroupBox: TsGroupBox
+        Tag = 15
         Left = 8
         Top = 128
         Width = 299
         Height = 114
-        Caption = 'Aktualizacja awatar'#243'w'
+        Caption = 'Aktualizacja'
         TabOrder = 1
         SkinData.SkinSection = 'GROUPBOX'
         Checked = False
         object LastAvatarsUpdateLabel: TsLabelFX
-          Left = 144
+          Tag = 19
+          Left = 120
           Top = 47
           Width = 60
           Height = 14
@@ -318,7 +327,8 @@ object SettingsForm: TSettingsForm
           Shadow.OffsetKeeper.RightBottom = 1
         end
         object LastAvatarsUpdateInfoLabel: TsLabel
-          Left = 38
+          Tag = 18
+          Left = 14
           Top = 47
           Width = 100
           Height = 13
@@ -331,12 +341,21 @@ object SettingsForm: TSettingsForm
           Font.Style = []
         end
         object ProgressLabel: TsLabel
+          Tag = 21
           Left = 18
           Top = 90
           Width = 100
           Height = 13
           Caption = 'Pobieranie danych...'
           Visible = False
+        end
+        object AvatarsUpdateLabel: TsLabel
+          Tag = 16
+          Left = 14
+          Top = 23
+          Width = 132
+          Height = 13
+          Caption = 'Automatyczna aktualizacja:'
         end
         object FileListBox: TFileListBox
           Left = 175
@@ -349,6 +368,7 @@ object SettingsForm: TSettingsForm
           Visible = False
         end
         object ManualAvatarsUpdateButton: TsButton
+          Tag = 20
           Left = 175
           Top = 74
           Width = 115
@@ -368,14 +388,12 @@ object SettingsForm: TSettingsForm
           SkinData.SkinSection = 'GAUGE'
         end
         object AutoAvatarsUpdateComboBox: TsComboBox
-          Left = 205
+          Tag = 17
+          Left = 152
           Top = 20
           Width = 80
           Height = 21
           Alignment = taLeftJustify
-          BoundLabel.Active = True
-          BoundLabel.Caption = 'Automatyczna aktualizacje awatar'#243'w:'
-          BoundLabel.Indent = 2
           SkinData.SkinSection = 'COMBOBOX'
           VerticalAlignment = taAlignTop
           Style = csDropDownList
@@ -397,15 +415,17 @@ object SettingsForm: TSettingsForm
         end
       end
       object AvatarsStyleGroupBox: TsGroupBox
+        Tag = 9
         Left = 8
         Top = 80
         Width = 299
         Height = 42
-        Caption = 'Styl awatar'#243'w'
+        Caption = 'Styl'
         TabOrder = 2
         SkinData.SkinSection = 'GROUPBOX'
         Checked = False
         object AvatarsStyleLabel: TsLabel
+          Tag = 10
           Left = 14
           Top = 20
           Width = 114
@@ -421,6 +441,7 @@ object SettingsForm: TSettingsForm
           Font.Style = []
         end
         object UsedAvatarsStyleLabel: TsLabelFX
+          Tag = 11
           Left = 134
           Top = 20
           Width = 46
@@ -442,6 +463,7 @@ object SettingsForm: TSettingsForm
           Shadow.OffsetKeeper.RightBottom = 1
         end
         object EditAvatarsStyleLabel: TsLabel
+          Tag = 12
           Left = 185
           Top = 20
           Width = 39
@@ -457,6 +479,7 @@ object SettingsForm: TSettingsForm
           Font.Style = [fsUnderline]
         end
         object AvatarStyleDefaultButton: TsButton
+          Tag = 13
           Left = 119
           Top = 124
           Width = 89
@@ -468,6 +491,7 @@ object SettingsForm: TSettingsForm
           SkinData.SkinSection = 'BUTTON'
         end
         object AvatarStyleSaveButton: TsButton
+          Tag = 14
           Left = 214
           Top = 124
           Width = 75
@@ -504,10 +528,12 @@ object SettingsForm: TSettingsForm
       end
     end
     object HighlightMsgTabSheet: TsTabSheet
+      Tag = 6
       Caption = 'Wyr'#243#380'nianie'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
       object EraseHighlightMsgSpeedButton: TsSpeedButton
+        Tag = 25
         Left = 17
         Top = 154
         Width = 23
@@ -557,6 +583,7 @@ object SettingsForm: TSettingsForm
         ShowCaption = False
       end
       object AddHighlightMsgsSpeedButton: TsSpeedButton
+        Tag = 27
         Left = 251
         Top = 154
         Width = 23
@@ -605,6 +632,7 @@ object SettingsForm: TSettingsForm
         ShowCaption = False
       end
       object RemoveHighlightMsgSpeedButton: TsSpeedButton
+        Tag = 28
         Left = 274
         Top = 154
         Width = 23
@@ -654,6 +682,7 @@ object SettingsForm: TSettingsForm
         ShowCaption = False
       end
       object HighlightMsgColorSelect: TsColorSelect
+        Tag = 26
         Left = 222
         Top = 154
         Width = 23
@@ -697,16 +726,26 @@ object SettingsForm: TSettingsForm
         ColorValue = clRed
         StandardDlg = True
       end
-      object HighlightMsgModeLabel: TsLabel
-        Left = 31
-        Top = 230
-        Width = 243
+      object HighlightMsgModeInfoLabel: TsLabel
+        Tag = 31
+        Left = 17
+        Top = 233
+        Width = 249
         Height = 13
-        Caption = 'Dzia'#322'a tylko przy wyr'#243#380'nianiu tag'#243'w/u'#380'ytkownik'#243'w'
+        Caption = 'Dzia'#322'a tylko przy wyr'#243#380'nianiu tag'#243'w / u'#380'ytkownik'#243'w'
         Enabled = False
         Visible = False
       end
+      object HighlightMsgModeLabel: TsLabel
+        Tag = 29
+        Left = 17
+        Top = 186
+        Width = 156
+        Height = 13
+        Caption = 'Spos'#243'b wyr'#243#380'niania wiadomo'#347'ci:'
+      end
       object HighlightMsgCheckBox: TsCheckBox
+        Tag = 22
         Left = 6
         Top = 6
         Width = 240
@@ -729,12 +768,14 @@ object SettingsForm: TSettingsForm
             Caption = 'Fraza'
             MaxWidth = 186
             MinWidth = 186
+            Tag = 23
             Width = 186
           end
           item
             Caption = 'Kolor'
             MaxWidth = 60
             MinWidth = 60
+            Tag = 24
             Width = 60
           end>
         RowSelect = True
@@ -764,15 +805,12 @@ object SettingsForm: TSettingsForm
         SkinData.SkinSection = 'EDIT'
       end
       object HighlightMsgModeComboBox: TsComboBox
+        Tag = 30
         Left = 17
-        Top = 203
+        Top = 205
         Width = 186
         Height = 22
         Alignment = taLeftJustify
-        BoundLabel.Active = True
-        BoundLabel.Caption = 'Spos'#243'b wyr'#243#380'niania wiadomo'#347'ci:'
-        BoundLabel.Indent = 4
-        BoundLabel.Layout = sclTopLeft
         SkinData.SkinSection = 'COMBOBOX'
         VerticalAlignment = taAlignTop
         Style = csOwnerDrawFixed
@@ -783,7 +821,7 @@ object SettingsForm: TSettingsForm
         Items.Strings = (
           'Zmieniaj kolor tekstu'
           'Zmieniaj kolor tekstu i odno'#347'nik'#243'w'
-          'Zmieniaj kolor szukanej frazy'
+          'Zmieniaj kolor frazy'
           'Zmieniaj kolor pola wiadomo'#347'ci')
       end
     end

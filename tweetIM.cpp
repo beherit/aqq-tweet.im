@@ -19,14 +19,14 @@
 
 #include <vcl.h>
 #include <windows.h>
-#pragma hdrstop
-#pragma argsused
 #include "TweetFrm.h"
-#include <PluginAPI.h>
 #include <inifiles.hpp>
 #include <IdHashMessageDigest.hpp>
 #include <fstream>
 #include <XMLDoc.hpp>
+#include <PluginAPI.h>
+#include <LangAPI.hpp>
+#pragma hdrstop
 
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved)
 {
@@ -76,6 +76,7 @@ TCustomIniFile* HighlightMsgColorsList = new TMemIniFile(ChangeFileExt(Applicati
 INT_PTR __stdcall OnActiveTab(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall OnLangCodeChanged(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall OnPrimaryTab(WPARAM wParam, LPARAM lParam);
@@ -342,26 +343,25 @@ void GetThemeStyle()
 		else if(!StaticAvatarStyle.IsEmpty())
 		{
 			AvatarStyle = StaticAvatarStyle;
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = "w³asny";
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
 		}
 		else
 		{
 			AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
 		}
 	}
 	else if(!StaticAvatarStyle.IsEmpty())
 	{
 		AvatarStyle = StaticAvatarStyle;
-		hSettingsForm->UsedAvatarsStyleLabel->Caption = "w³asny";
+		hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
 	}
 	else
 	{
 		AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-		hSettingsForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
+		hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
 	}
-	hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->UsedAvatarsStyleLabel->Width + 6;
-	hSettingsForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
+	hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->UsedAvatarsStyleLabel->Caption) + 6;
 	hSettingsForm->AvatarsStyleGroupBox->Height = 42;
 	hSettingsForm->EditAvatarsStyleLabel->Enabled = true;
 }
@@ -1670,6 +1670,37 @@ INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
 }
 //---------------------------------------------------------------------------
 
+//Hook na zmiane lokalizacji
+INT_PTR __stdcall OnLangCodeChanged(WPARAM wParam, LPARAM lParam)
+{
+	//Czyszczenie cache lokalizacji
+	ClearLngCache();
+	//Pobranie sciezki do katalogu prywatnego uzytkownika
+	UnicodeString PluginUserDir = GetPluginUserDir();
+	//Ustawienie sciezki lokalizacji wtyczki
+	UnicodeString LangCode = (wchar_t*)lParam;
+	LangPath = PluginUserDir + "\\\\Languages\\\\tweetIM\\\\" + LangCode + "\\\\";
+	if(!DirectoryExists(LangPath))
+	{
+		LangCode = (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_GETDEFLANGCODE,0,0);
+		LangPath = PluginUserDir + "\\\\Languages\\\\tweetIM\\\\" + LangCode + "\\\\";
+	}
+	//Aktualizacja lokalizacji form wtyczki
+	for(int i=0;i<Screen->FormCount;i++)
+		LangForm(Screen->Forms[i]);
+	//Poprawka pozycji komponentow
+	if(hSettingsForm)
+	{
+		hSettingsForm->UsedAvatarsStyleLabel->Left = hSettingsForm->AvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->AvatarsStyleLabel->Caption) + 6;
+		hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->UsedAvatarsStyleLabel->Caption) + 6;
+		hSettingsForm->AutoAvatarsUpdateComboBox->Left = hSettingsForm->AvatarsUpdateLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->AvatarsUpdateLabel->Caption) + 6;
+		hSettingsForm->LastAvatarsUpdateLabel->Left = hSettingsForm->LastAvatarsUpdateInfoLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->LastAvatarsUpdateInfoLabel->Caption) + 6;
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------
+
 //Hook na zaladowanie wszystkich modulow w AQQ (autoupdate awatarow)
 INT_PTR __stdcall OnModulesLoaded(WPARAM wParam, LPARAM lParam)
 {
@@ -2015,14 +2046,46 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 {
 	//Linkowanie wtyczki z komunikatorem
 	PluginLink = *Link;
-	//Przypisanie uchwytu do formy ustawien
-	if(!hSettingsForm)
-	{
-		Application->Handle = (HWND)SettingsForm;
-		hSettingsForm = new TSettingsForm(Application);
-	}
 	//Sciezka folderu prywatnego wtyczek
 	UnicodeString PluginUserDir = GetPluginUserDir();
+	//Tworzenie katalogow lokalizacji
+	if(!DirectoryExists(PluginUserDir+"\\\\Languages"))
+		CreateDir(PluginUserDir+"\\\\Languages");
+	if(!DirectoryExists(PluginUserDir+"\\\\Languages\\\\tweetIM"))
+		CreateDir(PluginUserDir+"\\\\Languages\\\\tweetIM");
+	if(!DirectoryExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN"))
+		CreateDir(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN");
+	if(!DirectoryExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL"))
+		CreateDir(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL");
+	//Wypakowanie plikow lokalizacji
+	//53AF5087607B6A0E099965BCE482E06D
+	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng"))
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng")!="53AF5087607B6A0E099965BCE482E06D")
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
+	//7A2609BAFE6DBF5A840F93DB5FEF23F4
+	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng"))
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="7A2609BAFE6DBF5A840F93DB5FEF23F4")
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
+	//BFF439E45D366FC3359529B1B6B261B2
+	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng"))
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng")!="BFF439E45D366FC3359529B1B6B261B2")
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
+	//450D8FBA9846B257512E55861A88F427
+	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng"))
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng")!="450D8FBA9846B257512E55861A88F427")
+		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
+	//Ustawienie sciezki lokalizacji wtyczki
+	UnicodeString LangCode = (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_GETLANGCODE,0,0);
+	LangPath = PluginUserDir + "\\\\Languages\\\\tweetIM\\\\" + LangCode + "\\\\";
+	if(!DirectoryExists(LangPath))
+	{
+		LangCode = (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_GETDEFLANGCODE,0,0);
+		LangPath = PluginUserDir + "\\\\Languages\\\\tweetIM\\\\" + LangCode + "\\\\";
+	}
 	//Wypakiwanie ikonki tweetIM.dll.png
 	//984BE6E674B8DD8C48B4C20EC0913586
 	if(!DirectoryExists(PluginUserDir+"\\\\Shared"))
@@ -2069,6 +2132,12 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	PluginLink.CreateServiceFunction(L"stweetIMSavedSearcheCommandItem",ServiceSavedSearchesCommandItem);
 	//Tworzenie interfejsu szybkiego dostepu do ustawien wtyczki
 	BuildtweetIMFastSettings();
+	//Przypisanie uchwytu do formy ustawien
+	if(!hSettingsForm)
+	{
+		Application->Handle = (HWND)SettingsForm;
+		hSettingsForm = new TSettingsForm(Application);
+	}
 	//Definiowanie User-Agent dla polaczen HTTP
 	hSettingsForm->IdHTTP->Request->UserAgent = "AQQ IM Plugin: tweet.IM/" + GetFileInfo(GetPluginDir().w_str(), L"FileVersion") + " (+http://beherit.pl)";
 	hSettingsForm->AUIdHTTP->Request->UserAgent = hSettingsForm->IdHTTP->Request->UserAgent;
@@ -2078,6 +2147,8 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	PluginLink.HookEvent(AQQ_CONTACTS_ADDLINE,OnAddLine);
 	//Hook na zmiane kolorystyki AlphaControls
 	PluginLink.HookEvent(AQQ_SYSTEM_COLORCHANGEV2,OnColorChange);
+	//Hook na zmiane lokalizacji
+	PluginLink.HookEvent(AQQ_SYSTEM_LANGCODE_CHANGED,OnLangCodeChanged);
 	//Hook na zaladowanie wszystkich modulow w AQQ (autoupdate awatarow)
 	PluginLink.HookEvent(AQQ_SYSTEM_MODULESLOADED,OnModulesLoaded);
 	//Hook na pobieranie adresow URL z roznych popup (tworzenie itemow w popup menu do akcji z tweetami)
@@ -2138,6 +2209,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 	PluginLink.UnhookEvent(OnActiveTab);
 	PluginLink.UnhookEvent(OnAddLine);
 	PluginLink.UnhookEvent(OnColorChange);
+	PluginLink.UnhookEvent(OnLangCodeChanged);
 	PluginLink.UnhookEvent(OnModulesLoaded);
 	PluginLink.UnhookEvent(OnPerformCopyData);
 	PluginLink.UnhookEvent(OnRecvMsg);
