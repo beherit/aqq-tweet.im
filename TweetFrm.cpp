@@ -62,7 +62,6 @@ __declspec(dllimport)UnicodeString GetAvatarsListItem();
 __declspec(dllimport)void LoadSettings();
 __declspec(dllimport)UnicodeString EncodeBase64(UnicodeString Str);
 //---------------------------------------------------------------------------
-bool AnimateMode;
 bool ForceDisconnect = false;
 //---------------------------------------------------------------------------
 __fastcall TSettingsForm::TSettingsForm(TComponent* Owner)
@@ -420,34 +419,28 @@ void __fastcall TSettingsForm::AvatarStyleSaveButtonClick(TObject *Sender)
 		UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
 	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + UsedAvatarsStyleLabel->Width + 6;
 	//Zamkniecie edycji stylu awatarow
+	AvatarsStyleGroupBox->Height = 42;
 	EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
 	UsedAvatarsStyleLabel->Left = AvatarsStyleLabel->Left + Canvas->TextWidth(AvatarsStyleLabel->Caption) + 6;
 	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + Canvas->TextWidth(UsedAvatarsStyleLabel->Caption) + 6;
-	AnimateMode = false;
-	AnimateTimer->Enabled = true;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TSettingsForm::EditAvatarsStyleLabelClick(TObject *Sender)
 {
-	//Wylaczanie timera animacji
-	if(AnimateTimer->Enabled)
-		AnimateTimer->Enabled = false;
-	//Chowanie edycji stylu awatarow
+	//Pokazywanie edycji stylu awatarow
 	if(AvatarsStyleGroupBox->Height==42)
 	{
 		EditAvatarsStyleLabel->Caption = GetLangStr("CancelEditing");
 		AvatarsStyleMemo->Text = GetAvatarStyle();
 		AvatarStyleSaveButton->Enabled = false;
-		AnimateMode = true;
-		AnimateTimer->Enabled = true;
+		AvatarsStyleGroupBox->Height = 162;
 	}
-	//Pokazywanie edycji stylu awatarow
+	//Chowanie edycji stylu awatarow
 	else
 	{
 		EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
-		AnimateMode = false;
-		AnimateTimer->Enabled = true;
+		AvatarsStyleGroupBox->Height = 42;
 	}
 	//Zezwalanie/blokowanie przywracanie domyslnego stylu awatarow
 	if(AvatarsStyleMemo->Text != "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
@@ -655,25 +648,6 @@ void __fastcall TSettingsForm::HighlightMsgModeComboBoxChange(TObject *Sender)
 	if(HighlightMsgModeComboBox->ItemIndex==2)
 		HighlightMsgModeLabel->Visible = true;
 	else HighlightMsgModeLabel->Visible = false;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::AnimateTimerTimer(TObject *Sender)
-{
-	//Pokazywanie ukrytego panelu
-	if(AnimateMode)
-	{
-		if(AvatarsStyleGroupBox->Height < 162)
-			AvatarsStyleGroupBox->Height = AvatarsStyleGroupBox->Height + 5;
-		else AnimateTimer->Enabled = false;
-	}
-	//Chowanie panelu
-	else
-	{
-		if(AvatarsStyleGroupBox->Height > 42)
-			AvatarsStyleGroupBox->Height = AvatarsStyleGroupBox->Height - 5;
-		else AnimateTimer->Enabled = false;
-	}
 }
 //---------------------------------------------------------------------------
 

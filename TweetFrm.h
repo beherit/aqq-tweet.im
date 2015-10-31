@@ -78,7 +78,6 @@ __published:	// IDE-managed Components
 	TIdThreadComponent *ManualAvatarsUpdateThread;
 	TIdThreadComponent *AutoAvatarsUpdateThread;
 	TIdHTTP *AUIdHTTP;
-	TTimer *AnimateTimer;
 	TsButton *AvatarStyleSaveButton;
 	TsButton *AvatarStyleDefaultButton;
 	TsSkinManager *sSkinManager;
@@ -135,7 +134,6 @@ __published:	// IDE-managed Components
 	void __fastcall ManualAvatarsUpdateThreadRun(TIdThreadComponent *Sender);
 	void __fastcall AutoAvatarsUpdateThreadRun(TIdThreadComponent *Sender);
 	void __fastcall EditAvatarsStyleLabelClick(TObject *Sender);
-	void __fastcall AnimateTimerTimer(TObject *Sender);
 	void __fastcall AvatarStyleDefaultButtonClick(TObject *Sender);
 	void __fastcall AvatarsStyleMemoChange(TObject *Sender);
 	void __fastcall AvatarStyleSaveButtonClick(TObject *Sender);
