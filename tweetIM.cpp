@@ -35,7 +35,7 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved
 //---------------------------------------------------------------------------
 
 //Uchwyt-do-formy-ustawien---------------------------------------------------
-TTweetForm* hTweetForm;
+TSettingsForm* hSettingsForm;
 //Struktury-glowne-----------------------------------------------------------
 TPluginLink PluginLink;
 TPluginInfo PluginInfo;
@@ -102,13 +102,13 @@ LRESULT CALLBACK TimerFrmProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 void OpenSettingsForm()
 {
 	//Przypisanie uchwytu do formy ustawien
-	if(!hTweetForm)
+	if(!hSettingsForm)
 	{
-		Application->Handle = (HWND)TweetForm;
-		hTweetForm = new TTweetForm(Application);
+		Application->Handle = (HWND)SettingsForm;
+		hSettingsForm = new TSettingsForm(Application);
 	}
 	//Pokaznie okna ustawien
-	hTweetForm->Show();
+	hSettingsForm->Show();
 }
 //---------------------------------------------------------------------------
 
@@ -244,9 +244,9 @@ UnicodeString DecodeBase64(UnicodeString Str)
 TColor GetWarningColor()
 {
 	//Odczyt pliku
-	hTweetForm->FileMemo->Lines->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
-	hTweetForm->FileMemo->Text = "<content>" + hTweetForm->FileMemo->Text + " </content>";
-	_di_IXMLDocument XMLDoc = LoadXMLData(hTweetForm->FileMemo->Text);
+	hSettingsForm->FileMemo->Lines->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
+	hSettingsForm->FileMemo->Text = "<content>" + hSettingsForm->FileMemo->Text + " </content>";
+	_di_IXMLDocument XMLDoc = LoadXMLData(hSettingsForm->FileMemo->Text);
 	_di_IXMLNode MainNode = XMLDoc->DocumentElement;
 	int MainNodesCount = MainNode->ChildNodes->GetCount();
 	//Parsowanie pliku XML
@@ -331,55 +331,39 @@ void GetThemeStyle()
 	if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))
 	{
 		//Pobieranie danych z pliku
-		hTweetForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
-		AvatarStyle = hTweetForm->FileMemo->Text;
+		hSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
+		AvatarStyle = hSettingsForm->FileMemo->Text;
 		AvatarStyle = AvatarStyle.Trim();
 		//Sprawdzanie zawartosci pliku
 		if(AvatarStyle.Pos("CC_AVATAR"))
 		{
-			hTweetForm->UsedAvatarsStyleLabel->Caption = "z kompozycji";
-			hTweetForm->EditAvatarsStyleLabel->Left = hTweetForm->UsedAvatarsStyleLabel->Left + hTweetForm->UsedAvatarsStyleLabel->Width + 6;
-			hTweetForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
-			hTweetForm->AvatarsStyleGroupBox->Height = 42;
-			hTweetForm->EditAvatarsStyleLabel->Enabled = false;
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = "z kompozycji";
 		}
 		else if(!StaticAvatarStyle.IsEmpty())
 		{
 			AvatarStyle = StaticAvatarStyle;
-			hTweetForm->UsedAvatarsStyleLabel->Caption = "w³asny";
-			hTweetForm->EditAvatarsStyleLabel->Left = hTweetForm->UsedAvatarsStyleLabel->Left + hTweetForm->UsedAvatarsStyleLabel->Width + 6;
-			hTweetForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
-			hTweetForm->AvatarsStyleGroupBox->Height = 42;
-			hTweetForm->EditAvatarsStyleLabel->Enabled = true;
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = "w³asny";
 		}
 		else
 		{
 			AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-			hTweetForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
-			hTweetForm->EditAvatarsStyleLabel->Left = hTweetForm->UsedAvatarsStyleLabel->Left + hTweetForm->UsedAvatarsStyleLabel->Width + 6;
-			hTweetForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
-			hTweetForm->AvatarsStyleGroupBox->Height = 42;
-			hTweetForm->EditAvatarsStyleLabel->Enabled = true;
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
 		}
 	}
 	else if(!StaticAvatarStyle.IsEmpty())
 	{
 		AvatarStyle = StaticAvatarStyle;
-		hTweetForm->UsedAvatarsStyleLabel->Caption = "w³asny";
-		hTweetForm->EditAvatarsStyleLabel->Left = hTweetForm->UsedAvatarsStyleLabel->Left + hTweetForm->UsedAvatarsStyleLabel->Width + 6;
-		hTweetForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
-		hTweetForm->AvatarsStyleGroupBox->Height = 42;
-		hTweetForm->EditAvatarsStyleLabel->Enabled = true;
+		hSettingsForm->UsedAvatarsStyleLabel->Caption = "w³asny";
 	}
 	else
 	{
 		AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-		hTweetForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
-		hTweetForm->EditAvatarsStyleLabel->Left = hTweetForm->UsedAvatarsStyleLabel->Left + hTweetForm->UsedAvatarsStyleLabel->Width + 6;
-		hTweetForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
-		hTweetForm->AvatarsStyleGroupBox->Height = 42;
-		hTweetForm->EditAvatarsStyleLabel->Enabled = true;
+		hSettingsForm->UsedAvatarsStyleLabel->Caption = "domyœlny";
 	}
+	hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->UsedAvatarsStyleLabel->Width + 6;
+	hSettingsForm->EditAvatarsStyleLabel->Caption = "(edytuj)";
+	hSettingsForm->AvatarsStyleGroupBox->Height = 42;
+	hSettingsForm->EditAvatarsStyleLabel->Enabled = true;
 }
 //---------------------------------------------------------------------------
 
@@ -437,42 +421,42 @@ void AutoAvatarsUpdate()
 		((AutoAvatarsUpdateMode==3)&&(DiffTime>=30)))
 		{
 			//Zmiana caption na buttonie
-			hTweetForm->ManualAvatarsUpdateButton->Caption = "Przerwij aktualizacje";
+			hSettingsForm->ManualAvatarsUpdateButton->Caption = "Przerwij aktualizacje";
 			//Tworzenie katalogu z awatarami
 			if(!DirectoryExists(AvatarsDir)) CreateDir(AvatarsDir);
 			//Wlaczenie paska postepu
-			hTweetForm->ProgressBar->Position = 0;
-			hTweetForm->ProgressBar->Visible = true;
-			hTweetForm->ProgressLabel->Caption = "Pobieranie danych...";
-			hTweetForm->ProgressLabel->Visible = true;
+			hSettingsForm->ProgressBar->Position = 0;
+			hSettingsForm->ProgressBar->Visible = true;
+			hSettingsForm->ProgressLabel->Caption = "Pobieranie danych...";
+			hSettingsForm->ProgressLabel->Visible = true;
 			//Wlaczenie paska postepu na taskbarze
-			hTweetForm->Taskbar->ProgressValue = 0;
-			hTweetForm->Taskbar->ProgressState = TTaskBarProgressState::Normal;
+			hSettingsForm->Taskbar->ProgressValue = 0;
+			hSettingsForm->Taskbar->ProgressState = TTaskBarProgressState::Normal;
 			//Pobieranie listy plikow
-			hTweetForm->FileListBox->Directory = "";
-			hTweetForm->FileListBox->Directory = GetPluginUserDirW() + "\\tweetIM\\Avatars";
+			hSettingsForm->FileListBox->Directory = "";
+			hSettingsForm->FileListBox->Directory = GetPluginUserDirW() + "\\tweetIM\\Avatars";
 			//Ignorowanie plikow *.tmp i plikow ze spacja (np. konflikty stworzone przez Dropbox'a)
-			for(int Count=0;Count<hTweetForm->FileListBox->Items->Count;Count++)
+			for(int Count=0;Count<hSettingsForm->FileListBox->Items->Count;Count++)
 			{
-				if(ExtractFileName(hTweetForm->FileListBox->Items->Strings[Count]).Pos(".tmp")>0)
+				if(ExtractFileName(hSettingsForm->FileListBox->Items->Strings[Count]).Pos(".tmp")>0)
 				{
-					DeleteFile(hTweetForm->FileListBox->Items->Strings[Count]);
-					hTweetForm->FileListBox->Items->Strings[Count] ="TMP_DELETE";
+					DeleteFile(hSettingsForm->FileListBox->Items->Strings[Count]);
+					hSettingsForm->FileListBox->Items->Strings[Count] ="TMP_DELETE";
 				}
-				else if(ExtractFileName(hTweetForm->FileListBox->Items->Strings[Count]).Pos(" ")>0)
+				else if(ExtractFileName(hSettingsForm->FileListBox->Items->Strings[Count]).Pos(" ")>0)
 				{
-					DeleteFile(hTweetForm->FileListBox->Items->Strings[Count]);
-					hTweetForm->FileListBox->Items->Strings[Count] = "TMP_DELETE";
+					DeleteFile(hSettingsForm->FileListBox->Items->Strings[Count]);
+					hSettingsForm->FileListBox->Items->Strings[Count] = "TMP_DELETE";
 				}
 			}
-			while(hTweetForm->FileListBox->Items->IndexOf("TMP_DELETE")!=-1)
-				hTweetForm->FileListBox->Items->Delete(hTweetForm->FileListBox->Items->IndexOf("TMP_DELETE"));
+			while(hSettingsForm->FileListBox->Items->IndexOf("TMP_DELETE")!=-1)
+				hSettingsForm->FileListBox->Items->Delete(hSettingsForm->FileListBox->Items->IndexOf("TMP_DELETE"));
 			//Ustawianie maksymalnego paska postepu
-			hTweetForm->ProgressBar->Max = hTweetForm->FileListBox->Items->Count;
+			hSettingsForm->ProgressBar->Max = hSettingsForm->FileListBox->Items->Count;
 			//Ustawianie maksymalnego paska postepu na taskbarze
-			hTweetForm->Taskbar->ProgressMaxValue = hTweetForm->FileListBox->Items->Count;
+			hSettingsForm->Taskbar->ProgressMaxValue = hSettingsForm->FileListBox->Items->Count;
 			//Wlacznie aktualizacji
-			hTweetForm->AutoAvatarsUpdateThread->Start();
+			hSettingsForm->AutoAvatarsUpdateThread->Start();
 		}
 	}
 	delete Ini;
@@ -1480,7 +1464,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					//Dodanie awatara do pobrania
 					GetAvatarsList->Add(TweetSender+";"+"https://beherit.pl/tweetIM/?user="+TweetSender);
 					//Wlaczenie watku
-					if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
+					if(!hSettingsForm->GetAvatarsThread->Active) hSettingsForm->GetAvatarsThread->Start();
 				}
 				//Awatar znajduje sie w folderze cache
 				else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
@@ -1670,15 +1654,15 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 INT_PTR __stdcall OnColorChange(WPARAM wParam, LPARAM lParam)
 {
 	//Okno ustawien zostalo juz stworzone
-	if(hTweetForm)
+	if(hSettingsForm)
 	{
 		//Wlaczona zaawansowana stylizacja okien
 		if(ChkSkinEnabled())
 		{
 			TPluginColorChange ColorChange = *(PPluginColorChange)wParam;
-			hTweetForm->sSkinManager->HueOffset = ColorChange.Hue;
-			hTweetForm->sSkinManager->Saturation = ColorChange.Saturation;
-			hTweetForm->sSkinManager->Brightness = ColorChange.Brightness;
+			hSettingsForm->sSkinManager->HueOffset = ColorChange.Hue;
+			hSettingsForm->sSkinManager->Saturation = ColorChange.Saturation;
+			hSettingsForm->sSkinManager->Brightness = ColorChange.Brightness;
 		}
 	}
 
@@ -1837,7 +1821,7 @@ INT_PTR __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
 INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 {
 	//Okno ustawien zostalo juz stworzone
-	if(hTweetForm)
+	if(hSettingsForm)
 	{
 		//Wlaczona zaawansowana stylizacja okien
 		if(ChkSkinEnabled())
@@ -1849,34 +1833,34 @@ INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 			{
 				//Dane pliku zaawansowanej stylizacji okien
 				ThemeSkinDir = StringReplace(ThemeSkinDir, "\\\\", "\\", TReplaceFlags() << rfReplaceAll);
-				hTweetForm->sSkinManager->SkinDirectory = ThemeSkinDir;
-				hTweetForm->sSkinManager->SkinName = "Skin.asz";
+				hSettingsForm->sSkinManager->SkinDirectory = ThemeSkinDir;
+				hSettingsForm->sSkinManager->SkinName = "Skin.asz";
 				//Ustawianie animacji AlphaControls
-				if(ChkThemeAnimateWindows()) hTweetForm->sSkinManager->AnimEffects->FormShow->Time = 200;
-				else hTweetForm->sSkinManager->AnimEffects->FormShow->Time = 0;
-				hTweetForm->sSkinManager->Effects->AllowGlowing = ChkThemeGlowing();
+				if(ChkThemeAnimateWindows()) hSettingsForm->sSkinManager->AnimEffects->FormShow->Time = 200;
+				else hSettingsForm->sSkinManager->AnimEffects->FormShow->Time = 0;
+				hSettingsForm->sSkinManager->Effects->AllowGlowing = ChkThemeGlowing();
 				//Zmiana kolorystyki AlphaControls
-				hTweetForm->sSkinManager->HueOffset = GetHUE();
-				hTweetForm->sSkinManager->Saturation = GetSaturation();
-				hTweetForm->sSkinManager->Brightness = GetBrightness();
+				hSettingsForm->sSkinManager->HueOffset = GetHUE();
+				hSettingsForm->sSkinManager->Saturation = GetSaturation();
+				hSettingsForm->sSkinManager->Brightness = GetBrightness();
 				//Aktywacja skorkowania AlphaControls
-				hTweetForm->sSkinManager->Active = true;
+				hSettingsForm->sSkinManager->Active = true;
 			}
 			//Brak pliku zaawansowanej stylizacji okien
-			else hTweetForm->sSkinManager->Active = false;
+			else hSettingsForm->sSkinManager->Active = false;
 		}
 		//Zaawansowana stylizacja okien wylaczona
-		else hTweetForm->sSkinManager->Active = false;
+		else hSettingsForm->sSkinManager->Active = false;
 		//Kolor labelow
-		if(hTweetForm->sSkinManager->Active)
+		if(hSettingsForm->sSkinManager->Active)
 		{
-			hTweetForm->UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
-			hTweetForm->LastAvatarsUpdateLabel->Kind->Color = hTweetForm->UsedAvatarsStyleLabel->Kind->Color;
+			hSettingsForm->UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
+			hSettingsForm->LastAvatarsUpdateLabel->Kind->Color = hSettingsForm->UsedAvatarsStyleLabel->Kind->Color;
 		}
 		else
 		{
-			hTweetForm->UsedAvatarsStyleLabel->Kind->Color = clGreen;
-			hTweetForm->LastAvatarsUpdateLabel->Kind->Color = clGreen;
+			hSettingsForm->UsedAvatarsStyleLabel->Kind->Color = clGreen;
+			hSettingsForm->LastAvatarsUpdateLabel->Kind->Color = clGreen;
 		}
 	}
 	//Pobranie stylu Avatars
@@ -1931,7 +1915,7 @@ INT_PTR __stdcall OnXMLDebug(WPARAM wParam, LPARAM lParam)
 								//Dodanie awatara do pobrania
 								GetAvatarsList->Add(twitter_nick+";"+avatar_url);
 								//Wlaczenie watku
-								if(!hTweetForm->GetAvatarsThread->Active) hTweetForm->GetAvatarsThread->Start();
+								if(!hSettingsForm->GetAvatarsThread->Active) hSettingsForm->GetAvatarsThread->Start();
 							}
 						}
 					}
@@ -2032,10 +2016,10 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	//Linkowanie wtyczki z komunikatorem
 	PluginLink = *Link;
 	//Przypisanie uchwytu do formy ustawien
-	if(!hTweetForm)
+	if(!hSettingsForm)
 	{
-		Application->Handle = (HWND)TweetForm;
-		hTweetForm = new TTweetForm(Application);
+		Application->Handle = (HWND)SettingsForm;
+		hSettingsForm = new TSettingsForm(Application);
 	}
 	//Sciezka folderu prywatnego wtyczek
 	UnicodeString PluginUserDir = GetPluginUserDir();
@@ -2086,8 +2070,8 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	//Tworzenie interfejsu szybkiego dostepu do ustawien wtyczki
 	BuildtweetIMFastSettings();
 	//Definiowanie User-Agent dla polaczen HTTP
-	hTweetForm->IdHTTP->Request->UserAgent = "AQQ IM Plugin: tweet.IM/" + GetFileInfo(GetPluginDir().w_str(), L"FileVersion") + " (+http://beherit.pl)";
-	hTweetForm->AUIdHTTP->Request->UserAgent = hTweetForm->IdHTTP->Request->UserAgent;
+	hSettingsForm->IdHTTP->Request->UserAgent = "AQQ IM Plugin: tweet.IM/" + GetFileInfo(GetPluginDir().w_str(), L"FileVersion") + " (+http://beherit.pl)";
+	hSettingsForm->AUIdHTTP->Request->UserAgent = hSettingsForm->IdHTTP->Request->UserAgent;
 	//Hook na aktwyna zakladke lub okno rozmowy (pokazywanie menu do cytowania, tworzenie buttonow)
 	PluginLink.HookEvent(AQQ_CONTACTS_BUDDY_ACTIVETAB,OnActiveTab);
 	//Hook na pokazywane wiadomosci (formatowanie tweetow)
@@ -2143,7 +2127,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 {
 	//Anty "Abnormal program termination"
-	hTweetForm->aForceDisconnect->Execute();
+	hSettingsForm->aForceDisconnect->Execute();
 	//Zatrzymanie timerow
 	for(int TimerID=10;TimerID<=20;TimerID=TimerID+10) KillTimer(hTimerFrm,TimerID);
 	//Usuwanie okna timera

@@ -61,7 +61,7 @@
 #include <Vcl.StdCtrls.hpp>
 #include <Vcl.Taskbar.hpp>
 //---------------------------------------------------------------------------
-class TTweetForm : public TForm
+class TSettingsForm : public TForm
 {
 __published:	// IDE-managed Components
 	TsButton *SaveButton;
@@ -163,7 +163,7 @@ private:	// User declarations
 public:		// User declarations
 	bool IdHTTPManualDisconnected;
 	bool AUIdHTTPManualDisconnected;
-	__fastcall TTweetForm(TComponent* Owner);
+	__fastcall TSettingsForm(TComponent* Owner);
 	void __fastcall WMTransparency(TMessage &Message);
 	bool __fastcall IdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL);
 	bool __fastcall AUIdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL);
@@ -172,6 +172,6 @@ public:		// User declarations
 	END_MESSAGE_MAP(TForm)
 };
 //---------------------------------------------------------------------------
-extern PACKAGE TTweetForm *TweetForm;
+extern PACKAGE TSettingsForm *SettingsForm;
 //---------------------------------------------------------------------------
 #endif
