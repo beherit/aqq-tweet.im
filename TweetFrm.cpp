@@ -86,6 +86,7 @@ bool __fastcall TSettingsForm::IdHTTPGetFileToMem(TMemoryStream* File, UnicodeSt
 	try
 	{
 		//Wywolanie polaczenia
+		IdHTTP->ConnectTimeout = 10000;
 		IdHTTP->Get(URL, File);
 	}
 	//Blad
@@ -114,12 +115,6 @@ bool __fastcall TSettingsForm::IdHTTPGetFileToMem(TMemoryStream* File, UnicodeSt
 	}
 	//Ustawianie pozycji pliku na poczatek
 	File->Position = 0;
-	//Polaczenie bylo zerwane
-	if(IdHTTPManualDisconnected)
-	{
-		IdHTTPManualDisconnected = false;
-		return false;
-	}
 	//Pobranie kodu odpowiedzi
 	int Response = IdHTTP->ResponseCode;
 	//Wszystko ok
@@ -138,6 +133,7 @@ bool __fastcall TSettingsForm::AUIdHTTPGetFileToMem(TMemoryStream* File, Unicode
 	try
 	{
 		//Wywolanie polaczenia
+		AUIdHTTP->ConnectTimeout = 10000;
 		AUIdHTTP->Get(URL, File);
 	}
 	//Blad
@@ -166,12 +162,6 @@ bool __fastcall TSettingsForm::AUIdHTTPGetFileToMem(TMemoryStream* File, Unicode
 	}
 	//Ustawianie pozycji pliku na poczatek
 	File->Position = 0;
-	//Polaczenie bylo zerwane
-	if(AUIdHTTPManualDisconnected)
-	{
-		AUIdHTTPManualDisconnected = false;
-		return false;
-	}
 	//Pobranie kodu odpowiedzi
 	int Response = AUIdHTTP->ResponseCode;
 	//Wszystko ok
@@ -781,77 +771,6 @@ void __fastcall TSettingsForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Se
 	AutoAvatarsUpdateThread->Stop();
 }
 //---------------------------------------------------------------------------*/
-
-void __fastcall TSettingsForm::AUIdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
-			__int64 AWorkCountMax)
-{
-	//Wlaczenie timera pilnujacego zawieszenie polaczenia
-	AUIdHTTPTimer->Enabled = true;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::AUIdHTTPWork(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCount)
-
-{
-	//Ponowne wlaczenie timera pilnujacego zawieszenie polaczenia
-	AUIdHTTPTimer->Enabled = false;
-	AUIdHTTPTimer->Enabled = true;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::AUIdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
-
-{
-	//Wylaczenie timera pilnujacego zawieszenie polaczenia
-	AUIdHTTPTimer->Enabled = false;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::AUIdHTTPTimerTimer(TObject *Sender)
-{
-	//Wylaczenie timera pilnujacego zawieszenie polaczenia
-	AUIdHTTPTimer->Enabled = false;
-	//Odznaczenie wymuszenia przerwania polaczenia
-	AUIdHTTPManualDisconnected = true;
-	//Przerwanie polaczenia
-	AUIdHTTP->Disconnect();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::IdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode,
-			__int64 AWorkCountMax)
-{
-	//Wlaczenie timera pilnujacego zawieszenie polaczenia
-	AvatarsIdHTTPTimer->Enabled = true;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::IdHTTPWork(TObject *ASender, TWorkMode AWorkMode,
-			__int64 AWorkCount)
-{
-	//Ponowne wlaczenie timera pilnujacego zawieszenie polaczenia
-	AvatarsIdHTTPTimer->Enabled = false;
-	AvatarsIdHTTPTimer->Enabled = true;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::IdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode)
-{
-	//Wylaczenie timera pilnujacego zawieszenie polaczenia
-	AvatarsIdHTTPTimer->Enabled = false;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TSettingsForm::AvatarsIdHTTPTimerTimer(TObject *Sender)
-{
-	//Wylaczenie timera pilnujacego zawieszenie polaczenia
-	AvatarsIdHTTPTimer->Enabled = false;
-	//Odznaczenie wymuszenia przerwania polaczenia
-	IdHTTPManualDisconnected = true;
-	//Przerwanie polaczenia
-	IdHTTP->Disconnect();
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TSettingsForm::GetAvatarsThreadRun(TIdThreadComponent *Sender)
 {

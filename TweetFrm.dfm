@@ -837,7 +837,6 @@ object SettingsForm: TSettingsForm
     Visible = False
   end
   object ActionList: TActionList
-    Left = 64
     Top = 264
     object aLoadSettings: TAction
       Caption = 'aLoadSettings'
@@ -881,9 +880,6 @@ object SettingsForm: TSettingsForm
   end
   object AUIdHTTP: TIdHTTP
     IOHandler = IdSSLIOHandlerSocketOpenSSL
-    OnWork = AUIdHTTPWork
-    OnWorkBegin = AUIdHTTPWorkBegin
-    OnWorkEnd = AUIdHTTPWorkEnd
     AllowCookies = False
     HandleRedirects = True
     ProxyParams.BasicAuthentication = False
@@ -940,7 +936,7 @@ object SettingsForm: TSettingsForm
     ThirdParty.ThirdStaticText = ' '
     ThirdParty.ThirdNativePaint = ' '
     OnSysDlgInit = sSkinManagerSysDlgInit
-    Left = 128
+    Left = 64
     Top = 264
   end
   object sSkinProvider: TsSkinProvider
@@ -952,14 +948,11 @@ object SettingsForm: TSettingsForm
     FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 96
+    Left = 32
     Top = 264
   end
   object IdHTTP: TIdHTTP
     IOHandler = IdSSLIOHandlerSocketOpenSSL
-    OnWork = IdHTTPWork
-    OnWorkBegin = IdHTTPWorkBegin
-    OnWorkEnd = IdHTTPWorkEnd
     AllowCookies = False
     HandleRedirects = True
     ProxyParams.BasicAuthentication = False
@@ -977,19 +970,6 @@ object SettingsForm: TSettingsForm
     HTTPOptions = [hoForceEncodeParams]
     Left = 32
     Top = 296
-  end
-  object AUIdHTTPTimer: TTimer
-    Enabled = False
-    Interval = 10000
-    OnTimer = AUIdHTTPTimerTimer
-    Left = 32
-    Top = 264
-  end
-  object AvatarsIdHTTPTimer: TTimer
-    Enabled = False
-    Interval = 10000
-    OnTimer = AvatarsIdHTTPTimerTimer
-    Top = 264
   end
   object IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL
     MaxLineAction = maException
@@ -1014,7 +994,7 @@ object SettingsForm: TSettingsForm
   object Taskbar: TTaskbar
     TaskBarButtons = <>
     TabProperties = []
-    Left = 162
+    Left = 98
     Top = 262
   end
 end

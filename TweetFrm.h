@@ -115,8 +115,6 @@ __published:	// IDE-managed Components
 	TsLabel *HighlightMsgModeInfoLabel;
 	TIdHTTP *IdHTTP;
 	TMemo *FileMemo;
-	TTimer *AUIdHTTPTimer;
-	TTimer *AvatarsIdHTTPTimer;
 	TIdSSLIOHandlerSocketOpenSSL *IdSSLIOHandlerSocketOpenSSL;
 	TIdThreadComponent *GetAvatarsThread;
 	TTaskbar *Taskbar;
@@ -148,21 +146,11 @@ __published:	// IDE-managed Components
 	void __fastcall HighlightMsgCheckBoxClick(TObject *Sender);
 	void __fastcall HighlightMsgListViewKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 	void __fastcall HighlightMsgModeComboBoxChange(TObject *Sender);
-	void __fastcall AUIdHTTPWork(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCount);
-	void __fastcall AUIdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCountMax);
-	void __fastcall AUIdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode);
-	void __fastcall AUIdHTTPTimerTimer(TObject *Sender);
-	void __fastcall IdHTTPWorkBegin(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCountMax);
-	void __fastcall IdHTTPWork(TObject *ASender, TWorkMode AWorkMode, __int64 AWorkCount);
-	void __fastcall IdHTTPWorkEnd(TObject *ASender, TWorkMode AWorkMode);
-	void __fastcall AvatarsIdHTTPTimerTimer(TObject *Sender);
 	void __fastcall GetAvatarsThreadRun(TIdThreadComponent *Sender);
 	void __fastcall ColorHighlightMsgEditChange(TObject *Sender);
 	void __fastcall sSkinManagerSysDlgInit(TacSysDlgData DlgData, bool &AllowSkinning);
 private:	// User declarations
 public:		// User declarations
-	bool IdHTTPManualDisconnected;
-	bool AUIdHTTPManualDisconnected;
 	__fastcall TSettingsForm(TComponent* Owner);
 	void __fastcall WMTransparency(TMessage &Message);
 	bool __fastcall IdHTTPGetFileToMem(TMemoryStream* File, UnicodeString URL);
