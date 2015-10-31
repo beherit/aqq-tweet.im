@@ -87,14 +87,13 @@ INT_PTR __stdcall ServicetweetIMFastSettingsItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceInsertTagItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceInsertNickItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam);
-INT_PTR __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam);
+INT_PTR __stdcall ServiceFavLatestTweetItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceShowTimelineItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceShowUserProfileItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceUpdateCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceIngCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceErsCommandItem(WPARAM wParam, LPARAM lParam);
 INT_PTR __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam);
-INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam);
 //FORWARD-TIMER--------------------------------------------------------------
 LRESULT CALLBACK TimerFrmProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //---------------------------------------------------------------------------
@@ -338,7 +337,7 @@ void GetThemeStyle()
 		//Sprawdzanie zawartosci pliku
 		if(AvatarStyle.Pos("CC_AVATAR"))
 		{
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = "z kompozycji";
+			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("FromTheme");
 		}
 		else if(!StaticAvatarStyle.IsEmpty())
 		{
@@ -421,13 +420,13 @@ void AutoAvatarsUpdate()
 		((AutoAvatarsUpdateMode==3)&&(DiffTime>=30)))
 		{
 			//Zmiana caption na buttonie
-			hSettingsForm->ManualAvatarsUpdateButton->Caption = "Przerwij aktualizacje";
+			hSettingsForm->ManualAvatarsUpdateButton->Caption = GetLangStr("AbortUpdates");
 			//Tworzenie katalogu z awatarami
 			if(!DirectoryExists(AvatarsDir)) CreateDir(AvatarsDir);
 			//Wlaczenie paska postepu
 			hSettingsForm->ProgressBar->Position = 0;
 			hSettingsForm->ProgressBar->Visible = true;
-			hSettingsForm->ProgressLabel->Caption = "Pobieranie danych...";
+			hSettingsForm->ProgressLabel->Caption = GetLangStr("RetrievingData");
 			hSettingsForm->ProgressLabel->Visible = true;
 			//Wlaczenie paska postepu na taskbarze
 			hSettingsForm->Taskbar->ProgressValue = 0;
@@ -600,7 +599,7 @@ void BuildInsertTagItem()
 	ZeroMemory(&InsertTagItem,sizeof(TPluginAction));
 	InsertTagItem.cbSize = sizeof(TPluginAction);
 	InsertTagItem.pszName = L"tweetIMInsertTagItem";
-	InsertTagItem.pszCaption = ("Wstaw " + ItemCopyData).w_str();
+	InsertTagItem.pszCaption = (GetLangStr("Insert") + " " + ItemCopyData).w_str();
 	InsertTagItem.Position = 0;
 	InsertTagItem.IconIndex = 11;
 	InsertTagItem.pszService = L"stweetIMInsertTagItem";
@@ -626,7 +625,7 @@ void BuildInsertNickItem()
 	ZeroMemory(&InsertNickItem,sizeof(TPluginAction));
 	InsertNickItem.cbSize = sizeof(TPluginAction);
 	InsertNickItem.pszName = L"tweetIMInsertNickItem";
-	InsertNickItem.pszCaption = ("Wstaw @" + ItemCopyData).w_str();
+	InsertNickItem.pszCaption = (GetLangStr("Insert") + " @" + ItemCopyData).w_str();
 	InsertNickItem.Position = 0;
 	InsertNickItem.IconIndex = 11;
 	InsertNickItem.pszService = L"stweetIMInsertNickItem";
@@ -652,7 +651,7 @@ void BuildSendPrivMsgItem()
 	ZeroMemory(&SendPrivMsgItem,sizeof(TPluginAction));
 	SendPrivMsgItem.cbSize = sizeof(TPluginAction);
 	SendPrivMsgItem.pszName = L"tweetIMSendPrivMsgItem";
-	SendPrivMsgItem.pszCaption = L"Wiadomoœæ prywatna";
+	SendPrivMsgItem.pszCaption = GetLangStr("PrivMsg").w_str();
 	SendPrivMsgItem.Position = 0;
 	SendPrivMsgItem.IconIndex = 8;
 	SendPrivMsgItem.pszService = L"stweetIMSendPrivMsgItem";
@@ -662,29 +661,29 @@ void BuildSendPrivMsgItem()
 }
 //---------------------------------------------------------------------------
 
-void DestroyLikeLastTweetItem()
+void DestroyFavLatestTweetItem()
 {
-	TPluginAction LikeLastTweetItem;
-	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
-	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
-	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
-	LikeLastTweetItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&LikeLastTweetItem));
+	TPluginAction FavLatestTweetItem;
+	ZeroMemory(&FavLatestTweetItem,sizeof(TPluginAction));
+	FavLatestTweetItem.cbSize = sizeof(TPluginAction);
+	FavLatestTweetItem.pszName = L"tweetIMFavLatestTweetItem";
+	FavLatestTweetItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&FavLatestTweetItem));
 }
 //---------------------------------------------------------------------------
-void BuildLikeLastTweetItem()
+void BuildFavLatestTweetItem()
 {
-	TPluginAction LikeLastTweetItem;
-	ZeroMemory(&LikeLastTweetItem,sizeof(TPluginAction));
-	LikeLastTweetItem.cbSize = sizeof(TPluginAction);
-	LikeLastTweetItem.pszName = L"tweetIMLikeLastTweetItem";
-	LikeLastTweetItem.pszCaption = L"Polub ostatnie tweetniêcie";
-	LikeLastTweetItem.Position = 0;
-	LikeLastTweetItem.IconIndex = 157;
-	LikeLastTweetItem.pszService = L"stweetIMLikeLastTweetItem";
-	LikeLastTweetItem.pszPopupName = L"popURL";
-	LikeLastTweetItem.Handle = (int)hFrmSend;
-	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&LikeLastTweetItem));
+	TPluginAction FavLatestTweetItem;
+	ZeroMemory(&FavLatestTweetItem,sizeof(TPluginAction));
+	FavLatestTweetItem.cbSize = sizeof(TPluginAction);
+	FavLatestTweetItem.pszName = L"tweetIMFavLatestTweetItem";
+	FavLatestTweetItem.pszCaption = GetLangStr("FavLatest").w_str();
+	FavLatestTweetItem.Position = 0;
+	FavLatestTweetItem.IconIndex = 157;
+	FavLatestTweetItem.pszService = L"stweetIMFavLatestTweetItem";
+	FavLatestTweetItem.pszPopupName = L"popURL";
+	FavLatestTweetItem.Handle = (int)hFrmSend;
+	PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&FavLatestTweetItem));
 }
 //---------------------------------------------------------------------------
 
@@ -706,7 +705,7 @@ void BuildShowTimelineItem()
 	ZeroMemory(&ShowTimelineItem,sizeof(TPluginAction));
 	ShowTimelineItem.cbSize = sizeof(TPluginAction);
 	ShowTimelineItem.pszName = L"tweetIMShowTimelineItem";
-	ShowTimelineItem.pszCaption = L"Poka¿ najnowsze tweetniêcia";
+	ShowTimelineItem.pszCaption = GetLangStr("ShowLatest").w_str();
 	ShowTimelineItem.Position = 0;
 	ShowTimelineItem.IconIndex = 21;
 	ShowTimelineItem.pszService = L"stweetIMShowTimelineItem";
@@ -734,7 +733,7 @@ void BuildShowUserProfileItem()
 	ZeroMemory(&ShowUserProfileItem,sizeof(TPluginAction));
 	ShowUserProfileItem.cbSize = sizeof(TPluginAction);
 	ShowUserProfileItem.pszName = L"tweetIMShowUserProfileItem";
-	ShowUserProfileItem.pszCaption = L"Poka¿ informacje o u¿ytkowniku";
+	ShowUserProfileItem.pszCaption = GetLangStr("UserInfo").w_str();
 	ShowUserProfileItem.Position = 0;
 	ShowUserProfileItem.IconIndex = 21;
 	ShowUserProfileItem.pszService = L"stweetIMShowUserProfileItem";
@@ -792,18 +791,12 @@ void DestroyCommandItems()
 	ErsCommandItem.cbSize = sizeof(TPluginAction);
 	ErsCommandItem.pszName = L"tweetIMErsCommandItem";
 	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&ErsCommandItem));
-	//Usuwanie "Usun poprzednie tweetniecie"
+	//Usuwanie "Usun ostatni tweet"
 	TPluginAction UndoTweetCommandItem;
 	ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
 	UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
 	UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
 	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&UndoTweetCommandItem));
-	//Usuwanie "Zapisane wyszukiwania"
-	TPluginAction SavedSearchesCommandItem;
-	ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
-	SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
-	SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
-	PluginLink.CallService(AQQ_CONTROLS_DESTROYPOPUPMENUITEM ,0,(LPARAM)(&SavedSearchesCommandItem));
 	//Usuwanie buttona w oknie rozmowy
 	TPluginAction CommandButton;
 	ZeroMemory(&CommandButton,sizeof(TPluginAction));
@@ -827,29 +820,18 @@ void BuildCommandItems()
 		ZeroMemory(&CommandButton,sizeof(TPluginAction));
 		CommandButton.cbSize = sizeof(TPluginAction);
 		CommandButton.pszName = L"tweetIMCommandButton";
-		CommandButton.Hint = L"Komendy bota tweet.IM";
+		CommandButton.Hint = GetLangStr("BotCommands").w_str();
 		CommandButton.Position = 0;
 		CommandButton.IconIndex = 131;
 		CommandButton.pszPopupName = L"tweetIMCommandPopUp";
 		CommandButton.Handle = (int)hFrmSend;
 		PluginLink.CallService(AQQ_CONTROLS_TOOLBAR "tbMain" AQQ_CONTROLS_CREATEBUTTON,0,(LPARAM)(&CommandButton));
-		//Tworzenie "Zapisane wyszukiwania"
-		TPluginAction SavedSearchesCommandItem;
-		ZeroMemory(&SavedSearchesCommandItem,sizeof(TPluginAction));
-		SavedSearchesCommandItem.cbSize = sizeof(TPluginAction);
-		SavedSearchesCommandItem.pszName = L"tweetIMSavedSearcheCommandItem";
-		SavedSearchesCommandItem.pszCaption = L"Zapisane wyszukiwania";
-		SavedSearchesCommandItem.Position = 0;
-		SavedSearchesCommandItem.IconIndex = 16;
-		SavedSearchesCommandItem.pszService = L"stweetIMSavedSearcheCommandItem";
-		SavedSearchesCommandItem.pszPopupName = L"tweetIMCommandPopUp";
-		PluginLink.CallService(AQQ_CONTROLS_CREATEPOPUPMENUITEM,0,(LPARAM)(&SavedSearchesCommandItem));
-		//Tworzenie "Usun poprzednie tweetniecie"
+		//Tworzenie "Usun ostatni tweet"
 		TPluginAction UndoTweetCommandItem;
 		ZeroMemory(&UndoTweetCommandItem,sizeof(TPluginAction));
 		UndoTweetCommandItem.cbSize = sizeof(TPluginAction);
 		UndoTweetCommandItem.pszName = L"tweetIMUndoTweetCommandItem";
-		UndoTweetCommandItem.pszCaption = L"Usuñ poprzednie tweetniêcie";
+		UndoTweetCommandItem.pszCaption = GetLangStr("UndoTweet").w_str();
 		UndoTweetCommandItem.Position = 0;
 		UndoTweetCommandItem.IconIndex = 10;
 		UndoTweetCommandItem.pszService = L"stweetIMUndoTweetCommandItem";
@@ -860,7 +842,7 @@ void BuildCommandItems()
 		ZeroMemory(&ErsCommandItem,sizeof(TPluginAction));
 		ErsCommandItem.cbSize = sizeof(TPluginAction);
 		ErsCommandItem.pszName = L"tweetIMErsCommandItem";
-		ErsCommandItem.pszCaption = L"Obserwuj¹cy";
+		ErsCommandItem.pszCaption = GetLangStr("Followers").w_str();
 		ErsCommandItem.Position = 0;
 		ErsCommandItem.IconIndex = 21;
 		ErsCommandItem.pszService = L"stweetIMErsCommandItem";
@@ -871,7 +853,7 @@ void BuildCommandItems()
 		ZeroMemory(&IngCommandItem,sizeof(TPluginAction));
 		IngCommandItem.cbSize = sizeof(TPluginAction);
 		IngCommandItem.pszName = L"tweetIMIngCommandItem";
-		IngCommandItem.pszCaption = L"Obserwowani";
+		IngCommandItem.pszCaption = GetLangStr("Followings").w_str();
 		IngCommandItem.Position = 0;
 		IngCommandItem.IconIndex = 21;
 		IngCommandItem.pszService = L"stweetIMIngCommandItem";
@@ -882,7 +864,7 @@ void BuildCommandItems()
 		ZeroMemory(&UpdateCommandItem,sizeof(TPluginAction));
 		UpdateCommandItem.cbSize = sizeof(TPluginAction);
 		UpdateCommandItem.pszName = L"tweetIMUpdateCommandItem";
-		UpdateCommandItem.pszCaption = L"Pobierz nieprzeczytane tweety";
+		UpdateCommandItem.pszCaption = GetLangStr("FetchUnread").w_str();
 		UpdateCommandItem.Position = 0;
 		UpdateCommandItem.IconIndex = 19;
 		UpdateCommandItem.pszService = L"stweetIMUpdateCommandItem";
@@ -994,7 +976,7 @@ INT_PTR __stdcall ServiceSendPrivMsgItem(WPARAM wParam, LPARAM lParam)
 //---------------------------------------------------------------------------
 
 //Serwis do lajkowania ostatniego tweetniecia
-INT_PTR __stdcall ServiceLikeLastTweetItem(WPARAM wParam, LPARAM lParam)
+INT_PTR __stdcall ServiceFavLatestTweetItem(WPARAM wParam, LPARAM lParam)
 {
 	//Struktura kontaktu
 	TPluginContact PluginContact;
@@ -1154,29 +1136,6 @@ INT_PTR __stdcall ServiceUndoTweetCommandItem(WPARAM wParam, LPARAM lParam)
 }
 //---------------------------------------------------------------------------
 
-//Serwis do "Zapisane wyszukiwania"
-INT_PTR __stdcall ServiceSavedSearchesCommandItem(WPARAM wParam, LPARAM lParam)
-{
-	//Struktura kontaktu
-	TPluginContact PluginContact;
-	PluginContact.JID = ActiveTabJID.w_str();
-	PluginContact.Resource = ActiveTabRes.w_str();
-	PluginContact.FromPlugin = false;
-	PluginContact.UserIdx = ActiveTabUsrIdx;
-	//Struktura wiadomosci
-	TPluginMessage PluginMessage;
-	PluginMessage.cbSize = sizeof(TPluginMessage);
-	PluginMessage.JID = ActiveTabJID.w_str();
-	PluginMessage.Body = L"ss";
-	PluginMessage.Store = false;
-	PluginMessage.ShowAsOutgoing = true;
-	//Wysylanie wiadomosci
-	PluginLink.CallService(AQQ_CONTACTS_SENDMSG ,(WPARAM)(&PluginContact),(LPARAM)(&PluginMessage));
-
-	return 0;
-}
-//---------------------------------------------------------------------------
-
 //Procka okna timera
 LRESULT CALLBACK TimerFrmProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1266,10 +1225,8 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 				//Wyjatki
 				if((Body!="Update request has been sent")
 				&&(Body!="The message has been sent.")
-				&&(Body!="You have no saved searches")
 				&&(!((Body.Pos("User ")==1)&&(Body.Pos(" now follows you"))))
 				&&(!((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore"))))
-				&&(Body.Pos("Saved searches:")!=1)
 				&&(!((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))))
 				{
 					//Zmiana miejsca poprzedniej zapamietanej wiadomosci
@@ -1277,16 +1234,14 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					//Zapamietanie wiadomosci
 					LastAddLineBody->WriteString("Body",ContactJID,Body);
 				}
-				//Tlumaczenie wiadomosci
+				//Tlumaczenie wybranych wiadomosci
 				else
 				{
 					//Tlumaczenie
 					if(Body=="Update request has been sent")
-						Body = "¯¹danie aktualizacji zosta³o wys³ane.";
+						Body = GetLangStr("UpdateRequest");
 					else if(Body=="The message has been sent.")
-						Body = "Wiadomoœæ zosta³a wys³ana.";
-					else if(Body=="You have no saved searches")
-						Body = "Nie masz zapisanych wyszukiwañ.";
+						Body = GetLangStr("MessageSent");
 					else if((Body.Pos("User ")==1)&&(Body.Pos(" now follows you")))
 					{
 						//Znaki HTMLowe
@@ -1296,10 +1251,10 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 						UserLogin.Delete(1,UserLogin.Pos("\""));
 						UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
 						//Tworzenie odnosnika
-						Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
-						//Spolszczanie pozostalych fraz
-						Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
-						Body = StringReplace(Body,"now follows you", "doda³ Ciê do obserowanych.", TReplaceFlags());
+						UserLogin = "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>";
+						//Tlumaczenie
+						Body = GetLangStr("FollowsYou");
+						Body = StringReplace(Body, "CC_USER", UserLogin, TReplaceFlags());
 					}
 					else if((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore")))
 					{
@@ -1310,26 +1265,19 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 						UserLogin.Delete(1,UserLogin.Pos("\""));
 						UserLogin.Delete(UserLogin.Pos("\""),UserLogin.Length());
 						//Tworzenie odnosnika
-						Body = StringReplace(Body, "\"" + UserLogin + "\"", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>", TReplaceFlags());
-						//Spolszczanie pozostalych fraz
-						Body = StringReplace(Body,"User", "U¿ytkownik", TReplaceFlags());
-						Body = StringReplace(Body,"doesn't follow you anymore", "przesta³ Ciê obserwowaæ.", TReplaceFlags());
-					}
-					else if(Body.Pos("Saved searches:")==1)
-					{
-						Body = StringReplace(Body,"Saved searches:", "Zapisane wyszukiwania:", TReplaceFlags());
-						goto Transalte_Jump;
+						UserLogin = "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\">@" + UserLogin + "</A></B>";
+						//Tlumaczenie
+						Body = GetLangStr("DoesentFollow");
+						Body = StringReplace(Body, "CC_USER", UserLogin, TReplaceFlags());
 					}
 					else if((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))
-						Body = "Twoja ostatnia wiadomoœæ zosta³a usuniêta.";
+						Body = GetLangStr("TweetErased");
 					//Zwrocenie zmodyfikowanej wiadomosci;
 					AddLineMessage.Body = Body.w_str();
 					memcpy((PPluginMessage)lParam,&AddLineMessage, sizeof(TPluginMessage));
 					return 2;
 				}
 			}
-			//Translate jump
-			Transalte_Jump: { /* Nic tu nie ma trolololo :D */ }
 
 			//Znaki HTMLowe
 			if(Body.Pos("&amp;")) Body = StringReplace(Body, "&amp;", "&", TReplaceFlags() << rfReplaceAll);
@@ -1718,7 +1666,7 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 	DestroyInsertTagItem();
 	DestroyInsertNickItem();
 	DestroySendPrivMsgItem();
-	DestroyLikeLastTweetItem();
+	DestroyFavLatestTweetItem();
 	DestroyShowTimelineItem();
 	DestroyShowUserProfileItem();
 	DestroySeparatorItem();
@@ -1764,7 +1712,7 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 				//Tworzenie elementu do pokazywania najnowszych tweetniec uzytkownika
 				BuildShowTimelineItem();
 				//Tworzenie elementu lajkowania ostatniego tweetniecia
-				BuildLikeLastTweetItem();
+				BuildFavLatestTweetItem();
 				//Tworzenie elementu wysylania prywatnej wiadomosci
 				BuildSendPrivMsgItem();
 				//Tworzenie elementu wstawiania nicku
@@ -1828,10 +1776,8 @@ INT_PTR __stdcall OnRecvMsg(WPARAM wParam, LPARAM lParam)
 			//Wyjatki
 			if((Body!="Update request has been sent")
 			&&(Body!="The message has been sent.")
-			&&(Body!="You have no saved searches")
 			&&(!((Body.Pos("User ")==1)&&(Body.Pos(" now follows you"))))
 			&&(!((Body.Pos("User ")==1)&&(Body.Pos(" doesn't follow you anymore"))))
-			&&(Body.Pos("Saved searches:")!=1)
 			&&(!((Body.Pos("Message #")==1)&&(Body.Pos(" was erased")))))
 			{
 				//Zmiana miejsca poprzedniej zapamietanej wiadomosci
@@ -2058,20 +2004,20 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	if(!DirectoryExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL"))
 		CreateDir(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL");
 	//Wypakowanie plikow lokalizacji
-	//53AF5087607B6A0E099965BCE482E06D
+	//0D074B67F6AB5F7659D06FD79779A2F5
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng")!="53AF5087607B6A0E099965BCE482E06D")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng")!="0D074B67F6AB5F7659D06FD79779A2F5")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
 	//7A2609BAFE6DBF5A840F93DB5FEF23F4
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
 	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="7A2609BAFE6DBF5A840F93DB5FEF23F4")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
-	//BFF439E45D366FC3359529B1B6B261B2
+	//6619E51EEECA6D21F712EEC28F0BF8C0
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng")!="BFF439E45D366FC3359529B1B6B261B2")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng")!="6619E51EEECA6D21F712EEC28F0BF8C0")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
 	//450D8FBA9846B257512E55861A88F427
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng"))
@@ -2115,7 +2061,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	//Serwis do wysylania wiadomosci prywatnej
 	PluginLink.CreateServiceFunction(L"stweetIMSendPrivMsgItem",ServiceSendPrivMsgItem);
 	//Serwis do lajkowania ostatniego tweetniecia
-	PluginLink.CreateServiceFunction(L"stweetIMLikeLastTweetItem",ServiceLikeLastTweetItem);
+	PluginLink.CreateServiceFunction(L"stweetIMFavLatestTweetItem",ServiceFavLatestTweetItem);
 	//Serwis do pokazywania najnowszych tweetniec uzytkownika
 	PluginLink.CreateServiceFunction(L"stweetIMShowTimelineItem",ServiceShowTimelineItem);
 	//Serwis do pokazywania informacji o uzytkowniku
@@ -2128,8 +2074,6 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	PluginLink.CreateServiceFunction(L"stweetIMErsCommandItem",ServiceErsCommandItem);
 	//Seris do "Usun poprzednie tweeetniecie"
 	PluginLink.CreateServiceFunction(L"stweetIMUndoTweetCommandItem",ServiceUndoTweetCommandItem);
-	//Serwis do "Zapisane wyszukiwania"
-	PluginLink.CreateServiceFunction(L"stweetIMSavedSearcheCommandItem",ServiceSavedSearchesCommandItem);
 	//Tworzenie interfejsu szybkiego dostepu do ustawien wtyczki
 	BuildtweetIMFastSettings();
 	//Przypisanie uchwytu do formy ustawien
@@ -2220,7 +2164,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 	DestroyInsertTagItem();
 	DestroyInsertNickItem();
 	DestroySendPrivMsgItem();
-	DestroyLikeLastTweetItem();
+	DestroyFavLatestTweetItem();
 	DestroyShowTimelineItem();
 	DestroyShowUserProfileItem();
 	DestroySeparatorItem();
@@ -2231,14 +2175,13 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 	PluginLink.DestroyServiceFunction(ServiceInsertTagItem);
 	PluginLink.DestroyServiceFunction(ServiceInsertNickItem);
 	PluginLink.DestroyServiceFunction(ServiceSendPrivMsgItem);
-	PluginLink.DestroyServiceFunction(ServiceLikeLastTweetItem);
+	PluginLink.DestroyServiceFunction(ServiceFavLatestTweetItem);
 	PluginLink.DestroyServiceFunction(ServiceShowTimelineItem);
 	PluginLink.DestroyServiceFunction(ServiceShowUserProfileItem);
 	PluginLink.DestroyServiceFunction(ServiceUpdateCommandItem);
 	PluginLink.DestroyServiceFunction(ServiceIngCommandItem);
 	PluginLink.DestroyServiceFunction(ServiceErsCommandItem);
-	PluginLink.DestroyServiceFunction(ServiceUndoTweetCommandItem);
-	PluginLink.DestroyServiceFunction(ServiceSavedSearchesCommandItem);
+	PluginLink.DestroyServiceFunction(ServiceUndoTweetCommandItem);;
 
 	return 0;
 }
