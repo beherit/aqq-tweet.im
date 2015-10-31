@@ -113,7 +113,7 @@ __published:	// IDE-managed Components
 	TsEdit *ColorHighlightMsgEdit;
 	TsEdit *ItemHighlightMsgEdit;
 	TsComboBox *HighlightMsgModeComboBox;
-	TsLabel *HighlightMsgModeLabel;
+	TsLabel *HighlightMsgModeInfoLabel;
 	TIdHTTP *IdHTTP;
 	TMemo *FileMemo;
 	TTimer *AUIdHTTPTimer;
@@ -121,6 +121,8 @@ __published:	// IDE-managed Components
 	TIdSSLIOHandlerSocketOpenSSL *IdSSLIOHandlerSocketOpenSSL;
 	TIdThreadComponent *GetAvatarsThread;
 	TTaskbar *Taskbar;
+	TsLabel *AvatarsUpdateLabel;
+	TsLabel *HighlightMsgModeLabel;
 	void __fastcall SaveButtonClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall aLoadSettingsExecute(TObject *Sender);

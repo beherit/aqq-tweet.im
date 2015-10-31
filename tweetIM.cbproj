@@ -147,6 +147,26 @@
             <ResourceType>DATA</ResourceType>
             <ResourceId>SHARED</ResourceId>
         </RcItem>
+        <RcItem Include="Languages\EN\Const.lng">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>DATA</ResourceType>
+            <ResourceId>EN_CONST</ResourceId>
+        </RcItem>
+        <RcItem Include="Languages\EN\TSettingsForm.lng">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>DATA</ResourceType>
+            <ResourceId>EN_SETTINGSFRM</ResourceId>
+        </RcItem>
+        <RcItem Include="Languages\PL\Const.lng">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>DATA</ResourceType>
+            <ResourceId>PL_CONST</ResourceId>
+        </RcItem>
+        <RcItem Include="Languages\PL\TSettingsForm.lng">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>DATA</ResourceType>
+            <ResourceId>PL_SETTINGSFRM</ResourceId>
+        </RcItem>
         <CppCompile Include="TweetFrm.cpp">
             <Form>SettingsForm</Form>
             <FormType>dfm</FormType>

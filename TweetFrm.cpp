@@ -19,10 +19,10 @@
 
 //---------------------------------------------------------------------------
 #include <vcl.h>
+#include <LangAPI.hpp>
 #pragma hdrstop
 #include "TweetFrm.h"
-#include <inifiles.hpp>
-#include <utilcls.h>
+//---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "acProgressBar"
 #pragma link "sBevel"
@@ -184,6 +184,13 @@ bool __fastcall TSettingsForm::AUIdHTTPGetFileToMem(TMemoryStream* File, Unicode
 
 void __fastcall TSettingsForm::FormCreate(TObject *Sender)
 {
+	//Lokalizowanie formy
+	LangForm(this);
+	//Poprawka pozycji komponentow
+	UsedAvatarsStyleLabel->Left = AvatarsStyleLabel->Left + Canvas->TextWidth(AvatarsStyleLabel->Caption) + 6;
+	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + Canvas->TextWidth(UsedAvatarsStyleLabel->Caption) + 6;
+	AutoAvatarsUpdateComboBox->Left = AvatarsUpdateLabel->Left + Canvas->TextWidth(AvatarsUpdateLabel->Caption) + 6;
+	LastAvatarsUpdateLabel->Left = LastAvatarsUpdateInfoLabel->Left + Canvas->TextWidth(LastAvatarsUpdateInfoLabel->Caption) + 6;
 	//Wlaczona zaawansowana stylizacja okien
 	if(ChkSkinEnabled())
 	{
@@ -238,7 +245,7 @@ void __fastcall TSettingsForm::FormShow(TObject *Sender)
 	sPageControl->ActivePage = AvatarsTabSheet;
 	//Ustawienie kontrolek
 	AvatarsStyleGroupBox->Height = 42;
-	EditAvatarsStyleLabel->Caption = "(edytuj)";
+	EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
 }
 //---------------------------------------------------------------------------
 
@@ -249,7 +256,7 @@ void __fastcall TSettingsForm::aLoadSettingsExecute(TObject *Sender)
 	AvatarWidthCSpinEdit->Value = Ini->ReadInteger("Avatars","Size",25);
 	UnicodeString tLastUpdate = Ini->ReadString("Avatars","LastUpdate","");
 	if(!tLastUpdate.IsEmpty()) LastAvatarsUpdateLabel->Caption = tLastUpdate;
-	else LastAvatarsUpdateLabel->Caption = "brak danych";
+	else LastAvatarsUpdateLabel->Caption = GetLangStr("NoData");
 	int tLastUpdateCount = Ini->ReadInteger("Avatars","LastUpdateCount",0);
 	if(tLastUpdateCount) LastAvatarsUpdateLabel->Caption = LastAvatarsUpdateLabel->Caption + " (" + IntToStr(tLastUpdateCount) + ")";
 	AutoAvatarsUpdateComboBox->ItemIndex = Ini->ReadInteger("Avatars","UpdateMode",0);
@@ -408,17 +415,14 @@ void __fastcall TSettingsForm::AvatarStyleSaveButtonClick(TObject *Sender)
 	SetAvatarStyle(AvatarsStyleMemo->Text);
 	//Info o rodzaju stylu
 	if(AvatarsStyleMemo->Text == "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
-	{
-		UsedAvatarsStyleLabel->Caption = "domyœlny";
-		EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + UsedAvatarsStyleLabel->Width + 6;
-	}
+		UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
 	else
-	{
-		UsedAvatarsStyleLabel->Caption = "w³asny";
-		EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + UsedAvatarsStyleLabel->Width + 6;
-	}
+		UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
+	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + UsedAvatarsStyleLabel->Width + 6;
 	//Zamkniecie edycji stylu awatarow
-	EditAvatarsStyleLabel->Caption = "(edytuj)";
+	EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
+	UsedAvatarsStyleLabel->Left = AvatarsStyleLabel->Left + Canvas->TextWidth(AvatarsStyleLabel->Caption) + 6;
+	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + Canvas->TextWidth(UsedAvatarsStyleLabel->Caption) + 6;
 	AnimateMode = false;
 	AnimateTimer->Enabled = true;
 }
@@ -432,7 +436,7 @@ void __fastcall TSettingsForm::EditAvatarsStyleLabelClick(TObject *Sender)
 	//Chowanie edycji stylu awatarow
 	if(AvatarsStyleGroupBox->Height==42)
 	{
-		EditAvatarsStyleLabel->Caption = "(anuluj edycjê)";
+		EditAvatarsStyleLabel->Caption = GetLangStr("CancelEditing");
 		AvatarsStyleMemo->Text = GetAvatarStyle();
 		AvatarStyleSaveButton->Enabled = false;
 		AnimateMode = true;
@@ -441,7 +445,7 @@ void __fastcall TSettingsForm::EditAvatarsStyleLabelClick(TObject *Sender)
 	//Pokazywanie edycji stylu awatarow
 	else
 	{
-		EditAvatarsStyleLabel->Caption = "(edytuj)";
+		EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
 		AnimateMode = false;
 		AnimateTimer->Enabled = true;
 	}
@@ -454,17 +458,17 @@ void __fastcall TSettingsForm::EditAvatarsStyleLabelClick(TObject *Sender)
 
 void __fastcall TSettingsForm::ManualAvatarsUpdateButtonClick(TObject *Sender)
 {
-	if(ManualAvatarsUpdateButton->Caption=="SprawdŸ aktualizacje")
+	if(ManualAvatarsUpdateButton->Caption==GetLangStr("CheckForUpdates"))
 	{
 		//Zmiana caption na buttonie
-		ManualAvatarsUpdateButton->Caption = "Przerwij aktualizacje";
+		ManualAvatarsUpdateButton->Caption = GetLangStr("AbortUpdates");
 		//Sprawdzanie czy folder awatar istnieje
 		if(!DirectoryExists(GetPluginUserDirW() + "\\tweetIM\\Avatars"))
 			CreateDir(GetPluginUserDirW() + "\\tweetIM\\Avatars");
 		//Wlaczenie paska postepu
 		ProgressBar->Position = 0;
 		ProgressBar->Visible = true;
-		ProgressLabel->Caption = "Pobieranie danych...";
+		ProgressLabel->Caption = GetLangStr("RetrievingData");
 		ProgressLabel->Visible = true;
 		//Wlaczenie paska postepu na taskbarze
 		Taskbar->ProgressValue = 0;
@@ -728,7 +732,7 @@ void __fastcall TSettingsForm::ManualAvatarsUpdateThreadRun(TIdThreadComponent *
 	//Wylaczenie paska postepuna taskbarze
 	Taskbar->ProgressState = TTaskBarProgressState::None;
 	//Default caption
-	ManualAvatarsUpdateButton->Caption ="SprawdŸ aktualizacje";
+	ManualAvatarsUpdateButton->Caption = GetLangStr("CheckForUpdates");
 	if(ForceDisconnect)
 	{
 		ManualAvatarsUpdateButton->Enabled = true;
@@ -794,7 +798,7 @@ void __fastcall TSettingsForm::AutoAvatarsUpdateThreadRun(TIdThreadComponent *Se
 	//Wylaczenie paska postepuna taskbarze
 	Taskbar->ProgressState = TTaskBarProgressState::None;
 	//Default caption
-	ManualAvatarsUpdateButton->Caption ="SprawdŸ aktualizacje";
+	ManualAvatarsUpdateButton->Caption = GetLangStr("CheckForUpdates");
 	if(ForceDisconnect)
 	{
 		ManualAvatarsUpdateButton->Enabled = true;
