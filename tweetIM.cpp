@@ -1308,7 +1308,6 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					TagWithOutHash.Delete(TagsCutPosition(TagWithOutHash),TagWithOutHash.Length());
 					//Usuwanie polskich znakow
 					UnicodeString TagWithOutHashW = TagWithOutHash;
-					TagWithOutHashW = TagWithOutHashW.LowerCase();
 					TagWithOutHashW = StringReplace(TagWithOutHashW, "ê", "e", TReplaceFlags() << rfReplaceAll);
 					TagWithOutHashW = StringReplace(TagWithOutHashW, "ó", "o", TReplaceFlags() << rfReplaceAll);
 					TagWithOutHashW = StringReplace(TagWithOutHashW, "¹", "a", TReplaceFlags() << rfReplaceAll);
@@ -1336,8 +1335,8 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 				}
 				else Body = StringReplace(Body, "#", "[CC_TAGS]", TReplaceFlags());
 			}
-			Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"http://aqq-link/?url=https://twitter.com/search?q=%23", TReplaceFlags() << rfReplaceAll);
-			Body = StringReplace(Body, "[CC_TAGS_LINK2]", "&src=hash\">", TReplaceFlags() << rfReplaceAll);
+			Body = StringReplace(Body, "[CC_TAGS_LINK]", "<A HREF=\"http://aqq-link/?url=https://twitter.com/hashtag/", TReplaceFlags() << rfReplaceAll);
+			Body = StringReplace(Body, "[CC_TAGS_LINK2]", "?src=hash\">", TReplaceFlags() << rfReplaceAll);
 			Body = StringReplace(Body, "[CC_TAGS_LINK3]", "</A>", TReplaceFlags() << rfReplaceAll);
 			Body = StringReplace(Body, "[CC_TAGS]", "#", TReplaceFlags() << rfReplaceAll);
 
@@ -1678,22 +1677,19 @@ INT_PTR __stdcall OnPerformCopyData(WPARAM wParam, LPARAM lParam)
 		//Pobranie danych
 		UnicodeString CopyData = (wchar_t*)lParam;
 		//Tagi
-		if(CopyData.Pos("https://twitter.com/search")==1)
+		if(CopyData.Pos("https://twitter.com/hashtag/")==1)
 		{
-			if(CopyData.Pos("https://twitter.com/search?q=%23")==1)
+			//Wyciaganie tag'u
+			CopyData.Delete(1,CopyData.Pos("/hashtag/")+8);
+			CopyData.Delete(CopyData.Pos("?src=hash"),CopyData.Length());
+			if(!CopyData.IsEmpty())
 			{
-				//Wyciaganie tag'u
-				CopyData.Delete(1,CopyData.Pos("search?q=%23")+11);
-				CopyData.Delete(CopyData.Pos("&src=hash"),CopyData.Length());
-				if(!CopyData.IsEmpty())
-				{
-					//Kopiowanie tag'u
-					ItemCopyData = "#" + CopyData;
-					//Tworzenie separatora
-	  				BuildSeparatorItem();
-					//Tworzenie elementu wstawiania tagu
-					BuildInsertTagItem();
-				}
+				//Kopiowanie tag'u
+				ItemCopyData = "#" + CopyData;
+				//Tworzenie separatora
+				BuildSeparatorItem();
+				//Tworzenie elementu wstawiania tagu
+				BuildInsertTagItem();
 			}
 		}
 		//Uzytkownicy
