@@ -256,7 +256,7 @@ void __fastcall TSettingsForm::FormShow(TObject *Sender)
 
 void __fastcall TSettingsForm::aLoadSettingsExecute(TObject *Sender)
 {
-	TIniFile *Ini = new TIniFile( GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
+	TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
 	//Awatary
 	AvatarWidthCSpinEdit->Value = Ini->ReadInteger("Avatars","Size",25);
 	UnicodeString tLastUpdate = Ini->ReadString("Avatars","LastUpdate","");
