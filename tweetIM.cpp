@@ -1636,13 +1636,27 @@ INT_PTR __stdcall OnLangCodeChanged(WPARAM wParam, LPARAM lParam)
 	//Aktualizacja lokalizacji form wtyczki
 	for(int i=0;i<Screen->FormCount;i++)
 		LangForm(Screen->Forms[i]);
-	//Poprawka pozycji komponentow
+	//Poprawki na formie ustawien
 	if(hSettingsForm)
 	{
+		//Odczyt typu stylu awatarow
+		if(!AvatarType) hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("FromTheme");
+		else if(AvatarType==1) hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
+		else hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
+		//Odczyt ostatniej aktualizacji awatarow
+		TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
+        UnicodeString tLastUpdate = Ini->ReadString("Avatars","LastUpdate","");
+		if(!tLastUpdate.IsEmpty()) hSettingsForm->LastAvatarsUpdateLabel->Caption = tLastUpdate;
+		else hSettingsForm->LastAvatarsUpdateLabel->Caption = GetLangStr("NoData");
+		int tLastUpdateCount = Ini->ReadInteger("Avatars","LastUpdateCount",0);
+		if(tLastUpdateCount) hSettingsForm->LastAvatarsUpdateLabel->Caption = hSettingsForm->LastAvatarsUpdateLabel->Caption + " (" + IntToStr(tLastUpdateCount) + ")";
+		delete Ini;
+		//Poprawka pozycji komponentow
 		hSettingsForm->UsedAvatarsStyleLabel->Left = hSettingsForm->AvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->AvatarsStyleLabel->Caption) + 6;
 		hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->UsedAvatarsStyleLabel->Caption) + 6;
 		hSettingsForm->AutoAvatarsUpdateComboBox->Left = hSettingsForm->AvatarsUpdateLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->AvatarsUpdateLabel->Caption) + 6;
 		hSettingsForm->LastAvatarsUpdateLabel->Left = hSettingsForm->LastAvatarsUpdateInfoLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->LastAvatarsUpdateInfoLabel->Caption) + 6;
+		hSettingsForm->AvatarsStyleGroupBox->Height = 42;
 	}
 
 	return 0;
