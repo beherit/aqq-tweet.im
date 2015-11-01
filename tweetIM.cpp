@@ -281,41 +281,6 @@ TColor GetWarningColor()
 }
 //---------------------------------------------------------------------------
 
-//Pobieranie informacji o pliku (wersja itp)
-UnicodeString GetFileInfo(wchar_t *ModulePath, String KeyName)
-{
-	LPVOID lpStr1 = NULL, lpStr2 = NULL;
-	WORD* wTmp;
-	DWORD dwHandlev = NULL;
-	UINT dwLength;
-	wchar_t sFileName[1024] = {0};
-	wchar_t sTmp[1024] = {0};
-	UnicodeString sInfo;
-	LPBYTE *pVersionInfo;
-
-	if(ModulePath == NULL) GetModuleFileName( NULL, sFileName, 1024);
-	else wcscpy(sFileName, ModulePath);
-
-	DWORD dwInfoSize = GetFileVersionInfoSize(sFileName, &dwHandlev);
-
-	if(dwInfoSize)
-	{
-		pVersionInfo = new LPBYTE[dwInfoSize];
-		if(GetFileVersionInfo(sFileName, dwHandlev, dwInfoSize, pVersionInfo))
-		{
-			if(VerQueryValue(pVersionInfo, L"\\VarFileInfo\\Translation", &lpStr1, &dwLength))
-			{
-				wTmp = (WORD*)lpStr1;
-				swprintf(sTmp, ("\\StringFileInfo\\%04x%04x\\" + KeyName).w_str(), *wTmp, *(wTmp + 1));
-				if(VerQueryValue(pVersionInfo, sTmp, &lpStr2, &dwLength)) sInfo = (LPCTSTR)lpStr2;
-			}
-		}
-		delete[] pVersionInfo;
-	}
-	return sInfo;
-}
-//---------------------------------------------------------------------------
-
 //Pobranie stylu awatarow
 void GetThemeStyle()
 {
@@ -2078,9 +2043,6 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 		Application->Handle = (HWND)SettingsForm;
 		hSettingsForm = new TSettingsForm(Application);
 	}
-	//Definiowanie User-Agent dla polaczen HTTP
-	hSettingsForm->IdHTTP->Request->UserAgent = "AQQ IM Plugin: tweet.IM/" + GetFileInfo(GetPluginDir().w_str(), L"FileVersion") + " (+http://beherit.pl)";
-	hSettingsForm->AUIdHTTP->Request->UserAgent = hSettingsForm->IdHTTP->Request->UserAgent;
 	//Hook na aktwyna zakladke lub okno rozmowy (pokazywanie menu do cytowania, tworzenie buttonow)
 	PluginLink.HookEvent(AQQ_CONTACTS_BUDDY_ACTIVETAB,OnActiveTab);
 	//Hook na pokazywane wiadomosci (formatowanie tweetow)
