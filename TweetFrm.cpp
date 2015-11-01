@@ -48,6 +48,9 @@ __declspec(dllimport)UnicodeString GetPluginUserDirW();
 __declspec(dllimport)UnicodeString GetThemeSkinDir();
 __declspec(dllimport)UnicodeString GetAvatarsDir();
 __declspec(dllimport)UnicodeString GetAvatarStyle();
+__declspec(dllimport)void SetAvatarStyle(UnicodeString Style);
+__declspec(dllimport)int GetAvatarType();
+__declspec(dllimport)SetAvatarType(int Type);
 __declspec(dllimport)TColor GetWarningColor();
 __declspec(dllimport)bool ChkSkinEnabled();
 __declspec(dllimport)bool ChkThemeAnimateWindows();
@@ -56,7 +59,6 @@ __declspec(dllimport)int GetHUE();
 __declspec(dllimport)int GetSaturation();
 __declspec(dllimport)int GetBrightness();
 __declspec(dllimport)UnicodeString MD5File(UnicodeString FileName);
-__declspec(dllimport)void SetAvatarStyle(UnicodeString Style);
 __declspec(dllimport)bool ChkAvatarsListItem();
 __declspec(dllimport)UnicodeString GetAvatarsListItem();
 __declspec(dllimport)void LoadSettings();
@@ -228,6 +230,20 @@ void __fastcall TSettingsForm::FormShow(TObject *Sender)
 	}
 	//Odczyt ustawien wtyczki
 	aLoadSettings->Execute();
+	//Odczyt typu stylu awatarow
+	int AvatarType = GetAvatarType();
+	if(AvatarType)
+	{
+		if(AvatarType==1) UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
+		else UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
+		EditAvatarsStyleLabel->Visible = true;
+	}
+	else
+	{
+		UsedAvatarsStyleLabel->Caption = GetLangStr("FromTheme");
+		EditAvatarsStyleLabel->Visible = false;
+	}
+	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + Canvas->TextWidth(UsedAvatarsStyleLabel->Caption) + 6;
 	//Wlaczanie przyciskow
 	SaveButton->Enabled = false;
 	//Ustawienie domyslnie wlaczonej karty ustawien
@@ -389,8 +405,7 @@ void __fastcall TSettingsForm::AvatarsStyleMemoChange(TObject *Sender)
 void __fastcall TSettingsForm::AvatarStyleDefaultButtonClick(TObject *Sender)
 {
 	//Przywracanie domyslnego stylu awatarow
-	if(AvatarsStyleMemo->Text != "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
-		AvatarsStyleMemo->Text = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
+	AvatarsStyleMemo->Text = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
 }
 //---------------------------------------------------------------------------
 
@@ -398,16 +413,21 @@ void __fastcall TSettingsForm::AvatarStyleSaveButtonClick(TObject *Sender)
 {
 	//Zapisanie stylu awatarow do pliku
 	TIniFile *Ini = new TIniFile(GetPluginUserDir() + "\\\\tweetIM\\\\Settings.ini");
-	Ini->WriteString("Avatars64", "Style", EncodeBase64(AvatarsStyleMemo->Text));
+	if(AvatarsStyleMemo->Text == "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
+	{
+		Ini->DeleteKey("Avatars64", "Style");
+        SetAvatarType(2);
+		UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
+	}
+	else
+	{
+		Ini->WriteString("Avatars64", "Style", EncodeBase64(AvatarsStyleMemo->Text));
+		SetAvatarType(1);
+		UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
+	}
 	delete Ini;
 	//Ustawienie stylu w rdzeniu wtyczki
 	SetAvatarStyle(AvatarsStyleMemo->Text);
-	//Info o rodzaju stylu
-	if(AvatarsStyleMemo->Text == "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
-		UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
-	else
-		UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
-	EditAvatarsStyleLabel->Left = UsedAvatarsStyleLabel->Left + UsedAvatarsStyleLabel->Width + 6;
 	//Zamkniecie edycji stylu awatarow
 	AvatarsStyleGroupBox->Height = 42;
 	EditAvatarsStyleLabel->Caption = GetLangStr("Edit");
