@@ -1,1 +1,4 @@
-Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.
+PL:
+Wtyczka przeznaczona dla osób korzystaj¹cych Twittera, formatuje ona wszystkie wiadomoœci z bota serwisu tweet.IM.
+EN:
+Plugin designed for people who use Twitter, it reformats all messages from bot of tweet.IM service.

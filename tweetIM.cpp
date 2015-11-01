@@ -2210,10 +2210,10 @@ extern "C" __declspec(dllexport) PPluginInfo __stdcall AQQPluginInfo(DWORD AQQVe
 {
 	PluginInfo.cbSize = sizeof(TPluginInfo);
 	PluginInfo.ShortName = L"tweet.IM";
-	PluginInfo.Version = PLUGIN_MAKE_VERSION(1,2,0,0);
-	PluginInfo.Description = L"Wtyczka przeznaczona dla osób u¿ywaj¹cych Twittera. Formatuje ona wszystkie wiadomoœci dla bota pochodz¹cego z serwisu tweet.IM.";
+	PluginInfo.Version = PLUGIN_MAKE_VERSION(1,3,0,0);
+	PluginInfo.Description = L"Wtyczka przeznaczona dla osób korzystaj¹cych Twittera, formatuje ona wszystkie wiadomoœci z bota serwisu tweet.IM.";
 	PluginInfo.Author = L"Krzysztof Grochocki";
-	PluginInfo.AuthorMail = L"kontakt@beherit.pl";
+	PluginInfo.AuthorMail = L"contact@beherit.pl";
 	PluginInfo.Copyright = L"Krzysztof Grochocki";
 	PluginInfo.Homepage = L"http://beherit.pl";
 	PluginInfo.Flag = 0;

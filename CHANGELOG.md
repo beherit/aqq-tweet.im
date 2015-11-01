@@ -1,3 +1,14 @@
+1.3.0.0
+-----
+* Obsługa lokalizacji (polskiej i angielskiej).
+* Usprawnienie pobierania awatarów.
+* Optymalizacja przy tworzeniu/usuwaniu elementów interfejsu.
+* Poprawki w linkowaniu hashtagów.
+* Usunięcie komendy pobierania zapisanych wyszukiwań.
+* Usunięcie animacji edycji stylu awatara.
+* Aktualizacja komponentów AlphaControls do nowszej wersji (10.19).
+* Inne mniej ważne zmiany.
+
 1.2.0.0
 -----
 * Pobieranie awatarów poprzez zewnętrzny skrypt PHP korzystający z REST API v1.1.

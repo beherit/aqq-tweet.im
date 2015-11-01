@@ -220,6 +220,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Awatary'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object AvatarsSizeGroupBox: TsGroupBox
         Tag = 7
         Left = 7
@@ -504,6 +508,10 @@ object SettingsForm: TSettingsForm
       Caption = 'Wyr'#243#380'nianie'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object EraseHighlightMsgSpeedButton: TsSpeedButton
         Tag = 25
         Left = 17
