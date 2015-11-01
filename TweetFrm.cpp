@@ -50,7 +50,7 @@ __declspec(dllimport)UnicodeString GetAvatarsDir();
 __declspec(dllimport)UnicodeString GetAvatarStyle();
 __declspec(dllimport)void SetAvatarStyle(UnicodeString Style);
 __declspec(dllimport)int GetAvatarType();
-__declspec(dllimport)SetAvatarType(int Type);
+__declspec(dllimport)void SetAvatarType(int Type);
 __declspec(dllimport)TColor GetWarningColor();
 __declspec(dllimport)bool ChkSkinEnabled();
 __declspec(dllimport)bool ChkThemeAnimateWindows();
