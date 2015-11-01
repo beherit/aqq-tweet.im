@@ -216,15 +216,15 @@ void __fastcall TSettingsForm::FormShow(TObject *Sender)
 	if(sSkinManager->Active)
 	{
 		//Kolor labelow
-		UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
-		LastAvatarsUpdateLabel->Kind->Color = UsedAvatarsStyleLabel->Kind->Color;
+		UsedAvatarsStyleLabel->Font->Color = GetWarningColor();
+		LastAvatarsUpdateLabel->Font->Color = UsedAvatarsStyleLabel->Font->Color;
 	}
 	//Zaawansowana stylizacja okien wylaczona
 	else
 	{
 		//Kolor labelow
-		UsedAvatarsStyleLabel->Kind->Color = clGreen;
-		LastAvatarsUpdateLabel->Kind->Color = clGreen;
+		UsedAvatarsStyleLabel->Font->Color = clGreen;
+		LastAvatarsUpdateLabel->Font->Color = clGreen;
 	}
 	//Odczyt ustawien wtyczki
 	aLoadSettings->Execute();

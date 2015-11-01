@@ -87,12 +87,10 @@ __published:	// IDE-managed Components
 	TsSkinProvider *sSkinProvider;
 	TsGroupBox *AvatarsSizeGroupBox;
 	TsGroupBox *AvatarsUpdateGroupBox;
-	TsLabelFX *LastAvatarsUpdateLabel;
 	TsLabel *LastAvatarsUpdateInfoLabel;
 	TsComboBox *AutoAvatarsUpdateComboBox;
 	TsGroupBox *AvatarsStyleGroupBox;
 	TsLabel *AvatarsStyleLabel;
-	TsLabelFX *UsedAvatarsStyleLabel;
 	TsLabel *EditAvatarsStyleLabel;
 	TsMemo *AvatarsStyleMemo;
 	TsLabel *ProgressLabel;
@@ -120,6 +118,8 @@ __published:	// IDE-managed Components
 	TTaskbar *Taskbar;
 	TsLabel *AvatarsUpdateLabel;
 	TsLabel *HighlightMsgModeLabel;
+	TsLabel *LastAvatarsUpdateLabel;
+	TsLabel *UsedAvatarsStyleLabel;
 	void __fastcall SaveButtonClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall aLoadSettingsExecute(TObject *Sender);
