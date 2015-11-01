@@ -304,28 +304,6 @@ object SettingsForm: TSettingsForm
         TabOrder = 1
         SkinData.SkinSection = 'GROUPBOX'
         Checked = False
-        object LastAvatarsUpdateLabel: TsLabelFX
-          Tag = 19
-          Left = 120
-          Top = 47
-          Width = 60
-          Height = 14
-          Caption = 'brak danych'
-          Color = clBtnFace
-          ParentColor = False
-          ParentFont = False
-          Font.Charset = EASTEUROPE_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          Angle = 0
-          Kind.KindType = ktCustom
-          Kind.Color = clGreen
-          Shadow.BlurCount = 0
-          Shadow.OffsetKeeper.LeftTop = 0
-          Shadow.OffsetKeeper.RightBottom = 1
-        end
         object LastAvatarsUpdateInfoLabel: TsLabel
           Tag = 18
           Left = 14
@@ -333,12 +311,6 @@ object SettingsForm: TSettingsForm
           Width = 100
           Height = 13
           Caption = 'Ostania aktualizacja:'
-          ParentFont = False
-          Font.Charset = EASTEUROPE_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
         end
         object ProgressLabel: TsLabel
           Tag = 21
@@ -356,6 +328,21 @@ object SettingsForm: TSettingsForm
           Width = 132
           Height = 13
           Caption = 'Automatyczna aktualizacja:'
+        end
+        object LastAvatarsUpdateLabel: TsLabel
+          Tag = 19
+          Left = 120
+          Top = 47
+          Width = 59
+          Height = 13
+          Caption = 'brak danych'
+          ParentFont = False
+          Font.Charset = EASTEUROPE_CHARSET
+          Font.Color = clGreen
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          UseSkinColor = False
         end
         object FileListBox: TFileListBox
           Left = 174
@@ -430,37 +417,7 @@ object SettingsForm: TSettingsForm
           Top = 20
           Width = 114
           Height = 13
-          BiDiMode = bdLeftToRight
           Caption = 'Aktualnie u'#380'ywany styl:'
-          ParentBiDiMode = False
-          ParentFont = False
-          Font.Charset = EASTEUROPE_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-        end
-        object UsedAvatarsStyleLabel: TsLabelFX
-          Tag = 11
-          Left = 134
-          Top = 20
-          Width = 46
-          Height = 14
-          Caption = 'domy'#347'lny'
-          Color = clBtnFace
-          ParentColor = False
-          ParentFont = False
-          Font.Charset = EASTEUROPE_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          Angle = 0
-          Kind.KindType = ktCustom
-          Kind.Color = clGreen
-          Shadow.BlurCount = 0
-          Shadow.OffsetKeeper.LeftTop = 0
-          Shadow.OffsetKeeper.RightBottom = 1
         end
         object EditAvatarsStyleLabel: TsLabel
           Tag = 12
@@ -477,6 +434,21 @@ object SettingsForm: TSettingsForm
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = [fsUnderline]
+        end
+        object UsedAvatarsStyleLabel: TsLabel
+          Tag = 11
+          Left = 134
+          Top = 20
+          Width = 45
+          Height = 13
+          Caption = 'domy'#347'lny'
+          ParentFont = False
+          Font.Charset = EASTEUROPE_CHARSET
+          Font.Color = clGreen
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          UseSkinColor = False
         end
         object AvatarStyleDefaultButton: TsButton
           Tag = 13

@@ -1792,13 +1792,13 @@ INT_PTR __stdcall OnThemeChanged(WPARAM wParam, LPARAM lParam)
 		//Kolor labelow
 		if(hSettingsForm->sSkinManager->Active)
 		{
-			hSettingsForm->UsedAvatarsStyleLabel->Kind->Color = GetWarningColor();
-			hSettingsForm->LastAvatarsUpdateLabel->Kind->Color = hSettingsForm->UsedAvatarsStyleLabel->Kind->Color;
+			hSettingsForm->UsedAvatarsStyleLabel->Font->Color = GetWarningColor();
+			hSettingsForm->LastAvatarsUpdateLabel->Font->Color = hSettingsForm->UsedAvatarsStyleLabel->Font->Color;
 		}
 		else
 		{
-			hSettingsForm->UsedAvatarsStyleLabel->Kind->Color = clGreen;
-			hSettingsForm->LastAvatarsUpdateLabel->Kind->Color = clGreen;
+			hSettingsForm->UsedAvatarsStyleLabel->Font->Color = clGreen;
+			hSettingsForm->LastAvatarsUpdateLabel->Font->Color = clGreen;
 		}
 	}
 	//Pobranie stylu Avatars
