@@ -46,6 +46,7 @@ UnicodeString ActiveTabRes;
 int ActiveTabUsrIdx;
 //Awatary
 TStringList *GetAvatarsList = new TStringList;
+int AvatarType;
 UnicodeString AvatarStyle;
 UnicodeString AvatarsDir;
 UnicodeString AvatarsDirW;
@@ -243,12 +244,17 @@ UnicodeString DecodeBase64(UnicodeString Str)
 //Pobranie stylu labela
 TColor GetWarningColor()
 {
+	//Przypisanie uchwytu do formy
+	Application->Handle = (HWND)SettingsForm;
+	TSettingsForm *hModalSettingsForm = new TSettingsForm(Application);
 	//Odczyt pliku
-	hSettingsForm->FileMemo->Lines->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
-	hSettingsForm->FileMemo->Text = "<content>" + hSettingsForm->FileMemo->Text + " </content>";
-	_di_IXMLDocument XMLDoc = LoadXMLData(hSettingsForm->FileMemo->Text);
+	hModalSettingsForm->FileMemo->Lines->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
+	hModalSettingsForm->FileMemo->Text = "<content>" + hModalSettingsForm->FileMemo->Text + " </content>";
+	_di_IXMLDocument XMLDoc = LoadXMLData(hModalSettingsForm->FileMemo->Text);
 	_di_IXMLNode MainNode = XMLDoc->DocumentElement;
 	int MainNodesCount = MainNode->ChildNodes->GetCount();
+    //Usuniecie uchwytu do formy
+	delete hModalSettingsForm;
 	//Parsowanie pliku XML
 	for(int Count=0;Count<MainNodesCount;Count++)
 	{
@@ -277,6 +283,7 @@ TColor GetWarningColor()
 			}
 		}
 	}
+	//Zwrocenie koloru
 	return (TColor)RGB(0,0,0);
 }
 //---------------------------------------------------------------------------
@@ -293,41 +300,44 @@ void GetThemeStyle()
 	ThemeURLW = StringReplace(ThemeURLW, "\\", "\\\\", TReplaceFlags() << rfReplaceAll);
 	ThemeURLW = ThemeURLW + "\\\\System\\\\Shared\\\\Themes\\\\Standard";
 	//Pobieranie stylu awatarow
-	if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))
+	if((FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))||(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.html")))
 	{
+		//Przypisanie uchwytu do formy
+		Application->Handle = (HWND)SettingsForm;
+		TSettingsForm *hModalSettingsForm = new TSettingsForm(Application);
 		//Pobieranie danych z pliku
-		hSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
-		AvatarStyle = hSettingsForm->FileMemo->Text;
+		if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm")) hModalSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
+		else hModalSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.html");
+		AvatarStyle = hModalSettingsForm->FileMemo->Text;
 		AvatarStyle = AvatarStyle.Trim();
+		//Usuniecie uchwytu do formy
+		delete hModalSettingsForm;
 		//Sprawdzanie zawartosci pliku
-		if(AvatarStyle.Pos("CC_AVATAR"))
+		if(!AvatarStyle.Pos("CC_AVATAR"))
 		{
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("FromTheme");
+			if(!StaticAvatarStyle.IsEmpty())
+			{
+				AvatarStyle = StaticAvatarStyle;
+				AvatarType = 1;
+			}
+			else
+			{
+				AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";;
+				AvatarType = 2;
+			}
 		}
-		else if(!StaticAvatarStyle.IsEmpty())
-		{
-			AvatarStyle = StaticAvatarStyle;
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
-		}
-		else
-		{
-			AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-			hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
-		}
+		else AvatarType = 0;
 	}
 	else if(!StaticAvatarStyle.IsEmpty())
 	{
 		AvatarStyle = StaticAvatarStyle;
-		hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Own");
+		AvatarType = 1;
 	}
 	else
 	{
 		AvatarStyle = "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>";
-		hSettingsForm->UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
+		AvatarType = 2;
 	}
-	hSettingsForm->EditAvatarsStyleLabel->Left = hSettingsForm->UsedAvatarsStyleLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->UsedAvatarsStyleLabel->Caption) + 6;
-	hSettingsForm->AvatarsStyleGroupBox->Height = 42;
-	hSettingsForm->EditAvatarsStyleLabel->Enabled = true;
 }
 //---------------------------------------------------------------------------
 
@@ -342,6 +352,20 @@ UnicodeString GetAvatarStyle()
 void SetAvatarStyle(UnicodeString Style)
 {
 	AvatarStyle = Style;
+}
+//---------------------------------------------------------------------------
+
+//Pobieranie typu stylu awatarow z rdzenia wtyczki
+int GetAvatarType()
+{
+	return AvatarType;
+}
+//---------------------------------------------------------------------------
+
+//Ustawianie typu stylu awatarow w rdzeniu wtyczki
+int SetAvatarType(int Type)
+{
+	AvatarType = Type;
 }
 //---------------------------------------------------------------------------
 
@@ -384,6 +408,12 @@ void AutoAvatarsUpdate()
 		((AutoAvatarsUpdateMode==2)&&(DiffTime>=7))||
 		((AutoAvatarsUpdateMode==3)&&(DiffTime>=30)))
 		{
+			//Przypisanie uchwytu do formy ustawien
+			if(!hSettingsForm)
+			{
+				Application->Handle = (HWND)SettingsForm;
+				hSettingsForm = new TSettingsForm(Application);
+			}
 			//Zmiana caption na buttonie
 			hSettingsForm->ManualAvatarsUpdateButton->Caption = GetLangStr("AbortUpdates");
 			//Tworzenie katalogu z awatarami
@@ -1375,6 +1405,12 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://beherit.pl/tweetIM/?user=" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 					//Dodanie awatara do pobrania
 					GetAvatarsList->Add(TweetSender+";"+"https://beherit.pl/tweetIM/?user="+TweetSender);
+					//Przypisanie uchwytu do formy ustawien
+					if(!hSettingsForm)
+					{
+						Application->Handle = (HWND)SettingsForm;
+						hSettingsForm = new TSettingsForm(Application);
+					}
 					//Wlaczenie watku
 					if(!hSettingsForm->GetAvatarsThread->Active) hSettingsForm->GetAvatarsThread->Start();
 				}
@@ -1852,6 +1888,12 @@ INT_PTR __stdcall OnXMLDebug(WPARAM wParam, LPARAM lParam)
 							{
 								//Dodanie awatara do pobrania
 								GetAvatarsList->Add(twitter_nick+";"+avatar_url);
+								//Przypisanie uchwytu do formy ustawien
+								if(!hSettingsForm)
+								{
+									Application->Handle = (HWND)SettingsForm;
+									hSettingsForm = new TSettingsForm(Application);
+								}
 								//Wlaczenie watku
 								if(!hSettingsForm->GetAvatarsThread->Active) hSettingsForm->GetAvatarsThread->Start();
 							}
@@ -2037,12 +2079,6 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 	PluginLink.CreateServiceFunction(L"stweetIMUndoTweetCommandItem",ServiceUndoTweetCommandItem);
 	//Tworzenie interfejsu szybkiego dostepu do ustawien wtyczki
 	BuildtweetIMFastSettings();
-	//Przypisanie uchwytu do formy ustawien
-	if(!hSettingsForm)
-	{
-		Application->Handle = (HWND)SettingsForm;
-		hSettingsForm = new TSettingsForm(Application);
-	}
 	//Hook na aktwyna zakladke lub okno rozmowy (pokazywanie menu do cytowania, tworzenie buttonow)
 	PluginLink.HookEvent(AQQ_CONTACTS_BUDDY_ACTIVETAB,OnActiveTab);
 	//Hook na pokazywane wiadomosci (formatowanie tweetow)
@@ -2100,7 +2136,7 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 extern "C" INT_PTR __declspec(dllexport) __stdcall Unload()
 {
 	//Anty "Abnormal program termination"
-	hSettingsForm->aForceDisconnect->Execute();
+	if(hSettingsForm) hSettingsForm->aForceDisconnect->Execute();
 	//Zatrzymanie timerow
 	for(int TimerID=10;TimerID<=20;TimerID=TimerID+10) KillTimer(hTimerFrm,TimerID);
 	//Usuwanie okna timera
