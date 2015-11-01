@@ -2,9 +2,9 @@
 tweet.IM jest wtyczką do komunikatora [AQQ](http://www.aqq.eu/pl.php). Przeznaczona jest dla osób używających Twittera, formatuje ona wszystkie wiadomości dla bota pochodzącego z serwisu tweet.IM.
 
 ### Wymagania
-Do skompilowania wtyczki potrzebne jest:
+Do skompilowania wtyczki tweet.IM potrzebne jest:
 
-* Embarcadero RAD Studio XE7 (C++Builder oraz Delphi, jeżeli chcemy kompilować wersję x64)
+* Embarcadero RAD Studio XE8 (C++Builder oraz Delphi, jeżeli chcemy kompilować wersję x64)
 * Pełna wersja komponentów [AlphaControls](http://www.alphaskins.com/) (do kompilacji wersji x64 potrzebne jest Delphi)
 * [Plik nagłówkowy SDK komunikatora AQQ](https://bitbucket.org/beherit/pluginapi-for-aqq-im)
 * Opcjonalnie [UPX](http://upx.sourceforge.net/) dla zmniejszenia rozmiaru pliku wynikowego (w szczególności wersji x64)
@@ -13,7 +13,7 @@ Do skompilowania wtyczki potrzebne jest:
 Znalezione błędy wtyczki należy zgłaszać w [tym temacie](http://forum.aqq.eu/topic/11932-tweetim-1000/) znajdującym na oficjalnym forum komunikatora AQQ lub pisząc bezpośrednio do autora wtyczki (preferowany kontakt poprzez Jabber).
 
 ### Kontakt z autorem
-Autorem wtyczki tweet.IM jest Krzysztof Grochocki. Możesz skontaktować się z nim drogą mailową (kontakt@beherit.pl) lub poprzez Jabber (im@beherit.pl).
+Autorem wtyczki tweet.IM jest Krzysztof Grochocki. Możesz skontaktować się z nim poprzez XMPP pisząc na im@beherit.pl.
 
 ### Licencja
 Wtyczka tweet.IM objęta jest licencją [GNU General Public License 3](http://www.gnu.org/copyleft/gpl.html).
