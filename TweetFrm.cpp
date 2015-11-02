@@ -416,7 +416,7 @@ void __fastcall TSettingsForm::AvatarStyleSaveButtonClick(TObject *Sender)
 	if(AvatarsStyleMemo->Text == "<span style=\"display: inline-block; padding: 2px 4px 0px 1px; vertical-align: middle;\">CC_AVATAR</span>")
 	{
 		Ini->DeleteKey("Avatars64", "Style");
-        SetAvatarType(2);
+		SetAvatarType(2);
 		UsedAvatarsStyleLabel->Caption = GetLangStr("Default");
 	}
 	else
