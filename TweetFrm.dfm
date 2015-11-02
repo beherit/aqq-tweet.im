@@ -806,16 +806,6 @@ object SettingsForm: TSettingsForm
       end
     end
   end
-  object FileMemo: TMemo
-    Left = 0
-    Top = 0
-    Width = 0
-    Height = 0
-    Lines.Strings = (
-      'FileMemo')
-    TabOrder = 4
-    Visible = False
-  end
   object ActionList: TActionList
     Top = 264
     object aLoadSettings: TAction

@@ -112,7 +112,6 @@ __published:	// IDE-managed Components
 	TsComboBox *HighlightMsgModeComboBox;
 	TsLabel *HighlightMsgModeInfoLabel;
 	TIdHTTP *IdHTTP;
-	TMemo *FileMemo;
 	TIdSSLIOHandlerSocketOpenSSL *IdSSLIOHandlerSocketOpenSSL;
 	TIdThreadComponent *GetAvatarsThread;
 	TTaskbar *Taskbar;
