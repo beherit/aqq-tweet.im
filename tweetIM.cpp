@@ -244,17 +244,14 @@ UnicodeString DecodeBase64(UnicodeString Str)
 //Pobranie stylu labela
 TColor GetWarningColor()
 {
-	//Przypisanie uchwytu do formy
-	Application->Handle = (HWND)SettingsForm;
-	TSettingsForm *hModalSettingsForm = new TSettingsForm(Application);
 	//Odczyt pliku
-	hModalSettingsForm->FileMemo->Lines->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
-	hModalSettingsForm->FileMemo->Text = "<content>" + hModalSettingsForm->FileMemo->Text + " </content>";
-	_di_IXMLDocument XMLDoc = LoadXMLData(hModalSettingsForm->FileMemo->Text);
+	TStringStream *Stream = new TStringStream;
+	Stream->LoadFromFile(GetThemeDir()+"\\\\elements.xml");
+	UnicodeString Text = Stream->DataString;
+	delete Stream;
+	_di_IXMLDocument XMLDoc = LoadXMLData("<content>" + Text + " </content>");
 	_di_IXMLNode MainNode = XMLDoc->DocumentElement;
 	int MainNodesCount = MainNode->ChildNodes->GetCount();
-    //Usuniecie uchwytu do formy
-	delete hModalSettingsForm;
 	//Parsowanie pliku XML
 	for(int Count=0;Count<MainNodesCount;Count++)
 	{
@@ -298,16 +295,12 @@ void GetThemeStyle()
 	//Pobieranie stylu awatarow
 	if((FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))||(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.html")))
 	{
-		//Przypisanie uchwytu do formy
-		Application->Handle = (HWND)SettingsForm;
-		TSettingsForm *hModalSettingsForm = new TSettingsForm(Application);
 		//Pobieranie danych z pliku
-		if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm")) hModalSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
-		else hModalSettingsForm->FileMemo->Lines->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.html");
-		AvatarStyle = hModalSettingsForm->FileMemo->Text;
-		AvatarStyle = AvatarStyle.Trim();
-		//Usuniecie uchwytu do formy
-		delete hModalSettingsForm;
+		TStringStream *Stream = new TStringStream;
+		if(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm")) Stream->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.htm");
+		else Stream->LoadFromFile(ThemeURL + "\\\\Message\\\\TweetAvatar.html");
+		AvatarStyle = Stream->DataString.Trim();
+		delete Stream;
 		//Sprawdzanie zawartosci pliku
 		if(!AvatarStyle.Pos("CC_AVATAR"))
 		{
