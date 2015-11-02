@@ -220,10 +220,6 @@ object SettingsForm: TSettingsForm
       Caption = 'Awatary'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object AvatarsSizeGroupBox: TsGroupBox
         Tag = 7
         Left = 7
@@ -508,10 +504,6 @@ object SettingsForm: TSettingsForm
       Caption = 'Wyr'#243#380'nianie'
       SkinData.CustomColor = False
       SkinData.CustomFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object EraseHighlightMsgSpeedButton: TsSpeedButton
         Tag = 25
         Left = 17
@@ -807,7 +799,7 @@ object SettingsForm: TSettingsForm
     end
   end
   object ActionList: TActionList
-    Top = 264
+    Top = 200
     object aLoadSettings: TAction
       Caption = 'aLoadSettings'
       OnExecute = aLoadSettingsExecute
@@ -836,7 +828,7 @@ object SettingsForm: TSettingsForm
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = ManualAvatarsUpdateThreadRun
-    Left = 128
+    Left = 32
     Top = 296
   end
   object AutoAvatarsUpdateThread: TIdThreadComponent
@@ -845,7 +837,7 @@ object SettingsForm: TSettingsForm
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = AutoAvatarsUpdateThreadRun
-    Left = 160
+    Left = 64
     Top = 296
   end
   object AUIdHTTP: TIdHTTP
@@ -866,7 +858,7 @@ object SettingsForm: TSettingsForm
     Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
     Left = 64
-    Top = 296
+    Top = 264
   end
   object sSkinManager: TsSkinManager
     ExtendedBorders = True
@@ -906,8 +898,8 @@ object SettingsForm: TSettingsForm
     ThirdParty.ThirdStaticText = ' '
     ThirdParty.ThirdNativePaint = ' '
     OnSysDlgInit = sSkinManagerSysDlgInit
-    Left = 64
-    Top = 264
+    Left = 32
+    Top = 232
   end
   object sSkinProvider: TsSkinProvider
     AddedTitle.Font.Charset = DEFAULT_CHARSET
@@ -918,8 +910,7 @@ object SettingsForm: TSettingsForm
     FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
-    Left = 32
-    Top = 264
+    Top = 232
   end
   object IdHTTP: TIdHTTP
     IOHandler = IdSSLIOHandlerSocketOpenSSL
@@ -939,7 +930,7 @@ object SettingsForm: TSettingsForm
     Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
     Left = 32
-    Top = 296
+    Top = 264
   end
   object IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL
     MaxLineAction = maException
@@ -950,7 +941,7 @@ object SettingsForm: TSettingsForm
     SSLOptions.Mode = sslmUnassigned
     SSLOptions.VerifyMode = []
     SSLOptions.VerifyDepth = 0
-    Top = 296
+    Top = 264
   end
   object GetAvatarsThread: TIdThreadComponent
     Active = False
@@ -958,13 +949,12 @@ object SettingsForm: TSettingsForm
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = GetAvatarsThreadRun
-    Left = 96
     Top = 296
   end
   object Taskbar: TTaskbar
     TaskBarButtons = <>
     TabProperties = []
-    Left = 98
-    Top = 262
+    Left = 64
+    Top = 232
   end
 end
