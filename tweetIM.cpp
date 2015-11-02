@@ -295,10 +295,6 @@ void GetThemeStyle()
 	AvatarStyle = "";
 	//URL do aktuanie uzywanej kompozycji
 	UnicodeString ThemeURL = GetThemeDir();
-	//URL do domyslnej kompozycji
-	UnicodeString ThemeURLW = (wchar_t*)(PluginLink.CallService(AQQ_FUNCTION_GETAPPPATH,0,0));
-	ThemeURLW = StringReplace(ThemeURLW, "\\", "\\\\", TReplaceFlags() << rfReplaceAll);
-	ThemeURLW = ThemeURLW + "\\\\System\\\\Shared\\\\Themes\\\\Standard";
 	//Pobieranie stylu awatarow
 	if((FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.htm"))||(FileExists(ThemeURL + "\\\\Message\\\\TweetAvatar.html")))
 	{
