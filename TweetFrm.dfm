@@ -793,8 +793,7 @@ object SettingsForm: TSettingsForm
         Items.Strings = (
           'Zmieniaj kolor tekstu'
           'Zmieniaj kolor tekstu i odno'#347'nik'#243'w'
-          'Zmieniaj kolor frazy'
-          'Zmieniaj kolor pola wiadomo'#347'ci')
+          'Zmieniaj kolor frazy')
       end
     end
   end
