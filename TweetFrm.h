@@ -110,7 +110,6 @@ __published:	// IDE-managed Components
 	TsEdit *ColorHighlightMsgEdit;
 	TsEdit *ItemHighlightMsgEdit;
 	TsComboBox *HighlightMsgModeComboBox;
-	TsLabel *HighlightMsgModeInfoLabel;
 	TIdHTTP *IdHTTP;
 	TIdSSLIOHandlerSocketOpenSSL *IdSSLIOHandlerSocketOpenSSL;
 	TIdThreadComponent *GetAvatarsThread;

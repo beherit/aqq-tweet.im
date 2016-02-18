@@ -698,16 +698,6 @@ object SettingsForm: TSettingsForm
         ColorValue = clRed
         StandardDlg = True
       end
-      object HighlightMsgModeInfoLabel: TsLabel
-        Tag = 31
-        Left = 17
-        Top = 233
-        Width = 249
-        Height = 13
-        Caption = 'Dzia'#322'a tylko przy wyr'#243#380'nianiu tag'#243'w / u'#380'ytkownik'#243'w'
-        Enabled = False
-        Visible = False
-      end
       object HighlightMsgModeLabel: TsLabel
         Tag = 29
         Left = 17
