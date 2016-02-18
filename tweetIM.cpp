@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013-2015 Krzysztof Grochocki
+// Copyright (C) 2013-2016 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -1537,39 +1537,6 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
 							}	
 						}
-						//Zmiana koloru pola wiadomosci
-						else if(HighlightMsgModeChk==3)
-						{
-							//Wyrozanie tagow
-							if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-							{
-								UnicodeString ItemBody = Body;
-								ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-								ItemBody.SetLength(1);
-								if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
-								{
-									Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
-							//Wyrozanianie uzytkownikow
-							else if(Item.Pos("@")==1)
-							{
-								UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-								if((Body.LowerCase().Pos(Item.LowerCase()))
-								||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
-								{
-									Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
-							//Wyrozanie dowolnych fraz
-							else if(Body.LowerCase().Pos(Item.LowerCase()))
-							{
-								Body = "<div style=\"padding-bottom: 4px; margin: -4px; border: 4px solid CC_COLOR; border-bottom: 0px; background: none repeat scroll 0 0 CC_COLOR;\">" + Body + "</div>";
-								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-							}
-						}
 					}
 				}
 			}
@@ -2015,20 +1982,20 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
 	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng")!="0D074B67F6AB5F7659D06FD79779A2F5")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
-	//7A2609BAFE6DBF5A840F93DB5FEF23F4
+	//D3FD8A9B2288ED4028643BC1A4740988
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="7A2609BAFE6DBF5A840F93DB5FEF23F4")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="D3FD8A9B2288ED4028643BC1A4740988")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
 	//6619E51EEECA6D21F712EEC28F0BF8C0
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
 	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng")!="6619E51EEECA6D21F712EEC28F0BF8C0")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
-	//450D8FBA9846B257512E55861A88F427
+	//47F098AE725B463931D49990A45BE69E
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng")!="450D8FBA9846B257512E55861A88F427")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng")!="47F098AE725B463931D49990A45BE69E")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
 	//Ustawienie sciezki lokalizacji wtyczki
 	UnicodeString LangCode = (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_GETLANGCODE,0,0);
