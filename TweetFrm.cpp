@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013-2015 Krzysztof Grochocki
+// Copyright (C) 2013-2016 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //
@@ -298,8 +298,6 @@ void __fastcall TSettingsForm::aLoadSettingsExecute(TObject *Sender)
 	ColorHighlightMsgEdit->Enabled = HighlightMsgCheckBox->Checked;
 	ItemHighlightMsgEdit->Enabled = HighlightMsgCheckBox->Checked;
 	HighlightMsgModeComboBox->Enabled = HighlightMsgCheckBox->Checked;
-	if(HighlightMsgModeComboBox->ItemIndex==2) HighlightMsgModeInfoLabel->Visible = true;
-	else HighlightMsgModeInfoLabel->Visible = false;
 	delete Ini;
 }
 //---------------------------------------------------------------------------
@@ -655,8 +653,6 @@ void __fastcall TSettingsForm::RemoveHighlightMsgSpeedButtonClick(TObject *Sende
 void __fastcall TSettingsForm::HighlightMsgModeComboBoxChange(TObject *Sender)
 {
 	aSettingsChanged->Execute();
-	if(HighlightMsgModeComboBox->ItemIndex==2) HighlightMsgModeInfoLabel->Visible = true;
-	else HighlightMsgModeInfoLabel->Visible = false;
 }
 //---------------------------------------------------------------------------
 

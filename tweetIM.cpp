@@ -1192,7 +1192,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 	if(ContactJID.Pos("@twitter.tweet.im"))
 	{
 		//Nadawca wiadomosci
-		UnicodeString TweetSender = "";
+		UnicodeString TweetSender[2];
 		//Pobieranie informacji	wiadomosci
 		TPluginMessage AddLineMessage = *(PPluginMessage)lParam;
 		UnicodeString MessageDate = (double)AddLineMessage.Date;
@@ -1370,17 +1370,18 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 				UnicodeString UserLogin = TempStr;
 				UserLogin.Delete(1,UserLogin.Pos("("));
 				UserLogin.Delete(UserLogin.Pos(")"),UserLogin.Length());
-				TweetSender = UserLogin;
+				TweetSender[0] = UserLogin;
 				//Wyciagniecie wyswietlanej nazwy
 				UnicodeString DisplayName = TempStr;
 				DisplayName.Delete(DisplayName.Pos("("),DisplayName.Length());
 				DisplayName = DisplayName.Trim();
+				TweetSender[1] = DisplayName;
 				//Tworzenie odnosnika
 				Body = StringReplace(Body, TempStr + ":", "<B><A HREF=\"http://aqq-link/?url=https://twitter.com/" + UserLogin + "\" title=\"@" + UserLogin + "\">" + DisplayName + "</A></B>:", TReplaceFlags());
 			}
 
 			//Dodawanie awatarow
-			if((ContactJID==MessageJID)&&(!TweetSender.IsEmpty()))
+			if((ContactJID==MessageJID)&&(!TweetSender[0].IsEmpty()))
 			{
 				//Tworzenie katalogu z awatarami
 				if(!DirectoryExists(AvatarsDir))
@@ -1388,12 +1389,12 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 				//Zmienna awataru
 				UnicodeString Avatars;
 				//Awatara nie ma w folderze cache
-				if(!FileExists(AvatarsDir + "\\\\" + TweetSender))
+				if(!FileExists(AvatarsDir + "\\\\" + TweetSender[0]))
 				{
 					//Wstawienie online'owego awatara
-					Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://beherit.pl/tweetIM/?user=" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+					Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender[0] + "\" title=\"@" + TweetSender[0] + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"https://beherit.pl/tweetIM/?user=" + TweetSender[0] + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 					//Dodanie awatara do pobrania
-					GetAvatarsList->Add(TweetSender+";"+"https://beherit.pl/tweetIM/?user="+TweetSender);
+					GetAvatarsList->Add(TweetSender[0]+";"+"https://beherit.pl/tweetIM/?user="+TweetSender[0]);
 					//Przypisanie uchwytu do formy ustawien
 					if(!hSettingsForm)
 					{
@@ -1404,7 +1405,7 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 					if(!hSettingsForm->GetAvatarsThread->Active) hSettingsForm->GetAvatarsThread->Start();
 				}
 				//Awatar znajduje sie w folderze cache
-				else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender + "\" title=\"@" + TweetSender + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
+				else Avatars = StringReplace(AvatarStyle, "CC_AVATAR", "<a href=\"http://aqq-link/?url=https://twitter.com/" + TweetSender[0] + "\" title=\"@" + TweetSender[0] + "\"><img class=\"twitter-avatar\" border=\"0px\" src=\"file:///" + AvatarsDirW + "/" + TweetSender[0] + "\" width=\"" + IntToStr(AvatarSize) + "px\" height=\"" + IntToStr(AvatarSize) + "px\"></a>", TReplaceFlags() << rfReplaceAll);
 				//Dodanie awatar(a/ow) do tresci wiadomosci
 				Body = Avatars + Body;
 			}
@@ -1421,121 +1422,52 @@ INT_PTR __stdcall OnAddLine(WPARAM wParam, LPARAM lParam)
 						//Pobieranie danych odnosnie wyroznienia
 						UnicodeString Item = HighlightMsgItemsList->Strings[Count];
 						UnicodeString Color = HighlightMsgColorsList->ReadString("Color",Item,"");
-						//Zmiana koloru tekstu (tryb I)
-						if(HighlightMsgModeChk==0)
+						//Zmiana koloru tekstu / zmiana koloru tekstu i odnosnikow
+						if((HighlightMsgModeChk==0)||(HighlightMsgModeChk==1))
 						{
-							//Wyrozanie tagow
-							if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
+							//Wyroznienie danej frazy
+							if(Body.LowerCase().Pos(Item.LowerCase()))
 							{
-								UnicodeString ItemBody = Body;
-								ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-								ItemBody.SetLength(1);
-								if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+								//Zmiana koloru tekstu
+								if(HighlightMsgModeChk==0)
 								{
-									Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
+									Body = "<span style=\"color: CC_COLOR;\">" + Body + "</span>";
 								}
-							}
-							//Wyrozanianie uzytkownikow
-							else if(Item.Pos("@")==1)
-							{
-								UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-								if((Body.LowerCase().Pos(Item.LowerCase()))
-								||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
-								{
-									Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
-							//Wyrozanie dowolnych fraz
-							else if(Body.LowerCase().Pos(Item.LowerCase()))
-							{
-								Body = "<div style=\"color: CC_COLOR;\">" + Body + "</div>";
-								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-							}
-						}
-						//Zmiana koloru tekstu (tryb II)
-						else if(HighlightMsgModeChk==1)
-						{
-							//Wyrozanie tagow
-							if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-							{
-								UnicodeString ItemBody = Body;
-								ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-								ItemBody.SetLength(1);
-								if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
+								//Zmiana koloru tekstu i odnosnikow
+								else
 								{
 									UnicodeString SelectorID = "MSG" + MessageDate;
 									SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-									Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
-							//Wyrozanianie uzytkownikow
-							else if(Item.Pos("@")==1)
-							{
-								UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-								if((Body.LowerCase().Pos(Item.LowerCase()))
-								||(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase()))
-								{
-									UnicodeString SelectorID = "MSG" + MessageDate;
-									SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-									Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
-							//Wyrozanie dowolnych fraz
-							else if(Body.LowerCase().Pos(Item.LowerCase()))
-							{
-								UnicodeString SelectorID = "MSG" + MessageDate;
-								SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-								Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><div id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</div>";
+									Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style><span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">" + Body + "</span>";
+                                }
 								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
 							}
 						}
 						//Zmiana koloru frazy
 						else if(HighlightMsgModeChk==2)
 						{
-							//Wyrozanie tagow
-							if((Item.Pos("#")==1)&&(Body.LowerCase().Pos(Item.LowerCase())))
-							{
-								UnicodeString ItemBody = Body;
-								ItemBody.Delete(1,ItemBody.LowerCase().Pos(Item.LowerCase())+Item.Length()-1);
-								ItemBody.SetLength(1);
-								if((ItemBody.IsEmpty())||(ItemBody==" ")||(ItemBody=="<"))
-								{
-									UnicodeString SelectorID = "MSG" + MessageDate;
-									SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
-									Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-									int Pos = Body.LowerCase().Pos(Item.LowerCase());
-									Body = Body.Insert("</span>",Pos+Item.Length());
-									Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
-									Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-								}
-							}
 							//Wyrozanie nadawcow wiadomosci
-							UnicodeString ItemWithOutCaret = StringReplace(Item, "@", "", TReplaceFlags());
-							if(ItemWithOutCaret.LowerCase()==TweetSender.LowerCase())
+							if(Item.LowerCase()=="@"+TweetSender[0].LowerCase())
 							{
 								UnicodeString SelectorID = "MSG" + MessageDate;
 								SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
 								Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-								int Pos = Body.LowerCase().Pos((ItemWithOutCaret.LowerCase()+"</a>"));
-								Body = Body.Insert("</span>",Pos+ItemWithOutCaret.Length());
+								int Pos = Body.LowerCase().Pos(TweetSender[1].LowerCase()+"</a>");
+								Body = Body.Insert("</span>",Pos+TweetSender[1].Length());
 								Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
 								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
 							}
-							//Wyroznianie zacytowanych uzytkownikow
-							if(Body.LowerCase().Pos(Item.LowerCase()+"</a>"))
+							//Wyroznianie innych dowolnych fraz
+							else if(Body.LowerCase().Pos(Item.LowerCase()))
 							{
 								UnicodeString SelectorID = "MSG" + MessageDate;
 								SelectorID = StringReplace(SelectorID, ",", "", TReplaceFlags() << rfReplaceAll);
 								Body = "<style>#" + SelectorID + " a { color: CC_COLOR; }</style>" + Body;
-								int Pos = Body.LowerCase().Pos(Item.LowerCase()+"</a>");
+								int Pos = Body.LowerCase().Pos(Item.LowerCase());
 								Body = Body.Insert("</span>",Pos+Item.Length());
 								Body = Body.Insert("<span id=\"" + SelectorID + "\" style=\"color: CC_COLOR;\">",Pos);
 								Body = StringReplace(Body, "CC_COLOR", Color, TReplaceFlags() << rfReplaceAll);
-							}	
+							}
 						}
 					}
 				}
@@ -1982,20 +1914,20 @@ extern "C" INT_PTR __declspec(dllexport) __stdcall Load(PPluginLink Link)
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
 	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng")!="0D074B67F6AB5F7659D06FD79779A2F5")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\Const.lng").w_str(),L"EN_CONST",L"DATA");
-	//D3FD8A9B2288ED4028643BC1A4740988
+	//DBEFE8CFFA2B8180E9A732620333F87F
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="D3FD8A9B2288ED4028643BC1A4740988")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng")!="DBEFE8CFFA2B8180E9A732620333F87F")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\EN\\\\TSettingsForm.lng").w_str(),L"EN_SETTINGSFRM",L"DATA");
 	//6619E51EEECA6D21F712EEC28F0BF8C0
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
 	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng")!="6619E51EEECA6D21F712EEC28F0BF8C0")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\Const.lng").w_str(),L"PL_CONST",L"DATA");
-	//47F098AE725B463931D49990A45BE69E
+	//3C2C6A56C4BDC1BBD3252E43BC9A97C7
 	if(!FileExists(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng"))
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
-	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng")!="47F098AE725B463931D49990A45BE69E")
+	else if(MD5File(PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng")!="3C2C6A56C4BDC1BBD3252E43BC9A97C7")
 		ExtractRes((PluginUserDir+"\\\\Languages\\\\tweetIM\\\\PL\\\\TSettingsForm.lng").w_str(),L"PL_SETTINGSFRM",L"DATA");
 	//Ustawienie sciezki lokalizacji wtyczki
 	UnicodeString LangCode = (wchar_t*)PluginLink.CallService(AQQ_FUNCTION_GETLANGCODE,0,0);
