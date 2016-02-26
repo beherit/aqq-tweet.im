@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Copyright (C) 2013-2015 Krzysztof Grochocki
+// Copyright (C) 2013-2016 Krzysztof Grochocki
 //
 // This file is part of tweet.IM
 //

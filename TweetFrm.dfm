@@ -218,8 +218,10 @@ object SettingsForm: TSettingsForm
     object AvatarsTabSheet: TsTabSheet
       Tag = 5
       Caption = 'Awatary'
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object AvatarsSizeGroupBox: TsGroupBox
         Tag = 7
         Left = 7
@@ -502,8 +504,10 @@ object SettingsForm: TSettingsForm
     object HighlightMsgTabSheet: TsTabSheet
       Tag = 6
       Caption = 'Wyr'#243#380'nianie'
-      SkinData.CustomColor = False
-      SkinData.CustomFont = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object EraseHighlightMsgSpeedButton: TsSpeedButton
         Tag = 25
         Left = 17
@@ -896,7 +900,6 @@ object SettingsForm: TSettingsForm
     AddedTitle.Font.Height = -11
     AddedTitle.Font.Name = 'Tahoma'
     AddedTitle.Font.Style = []
-    FormHeader.AdditionalHeight = 0
     SkinData.SkinSection = 'FORM'
     TitleButtons = <>
     Top = 232
