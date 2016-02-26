@@ -3,6 +3,7 @@ syntax: glob
 
 *.aqq
 *.local
+*.stat
 __history\*
 Win32\Release\*
 Win32\Debug\*
