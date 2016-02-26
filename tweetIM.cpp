@@ -1546,6 +1546,9 @@ INT_PTR __stdcall OnLangCodeChanged(WPARAM wParam, LPARAM lParam)
 		hSettingsForm->LastAvatarsUpdateLabel->Left = hSettingsForm->LastAvatarsUpdateInfoLabel->Left + hSettingsForm->Canvas->TextWidth(hSettingsForm->LastAvatarsUpdateInfoLabel->Caption) + 6;
 		hSettingsForm->AvatarsStyleGroupBox->Height = 42;
 	}
+	//Aktualizacja przyciskow w interfejsie jezeli aktywny kontakt jest botem tweet.IM
+	if(ActiveTabJID.Pos("@twitter.tweet.im"))
+		BuildCommandItems();
 
 	return 0;
 }
