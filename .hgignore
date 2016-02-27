@@ -4,6 +4,7 @@ syntax: glob
 *.aqq
 *.local
 *.stat
+*.res
 __history\*
 Win32\Release\*
 Win32\Debug\*
