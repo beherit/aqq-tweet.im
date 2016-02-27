@@ -1,3 +1,11 @@
+1.3.2.0
+-----
+* Ulepszenie działania funkcji wyróżniania.
+* Usunięcie wyróżniania poprzez zmianę koloru pola wiadomości.
+* Aktualizacja przycisków w oknie rozmowy po zmianie lokalizacji.
+* Aktualizacja komponentów AlphaControls do nowszej wersji (10.26).
+* Inne mniej ważne zmiany.
+
 1.3.0.0
 -----
 * Obsługa lokalizacji (polskiej i angielskiej).
